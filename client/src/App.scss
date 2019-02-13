@@ -1,0 +1,94 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:400,400i,500,500i,600,600i,700");
+
+$font-family-sans-serif: "Poppins" !default;
+
+// Colors
+
+$white: #fff !default;
+$gray-100: #f8f9fa !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #ced4da !default;
+$gray-500: #adb5bd !default;
+$gray-600: #6c757d !default;
+$gray-700: #4f5467 !default;
+$gray-800: #343a40 !default;
+$gray-900: #212529 !default;
+$black: #000 !default;
+
+$blue: #5475ed !default;
+$indigo: #6610f2 !default;
+$purple: #7015bd !default;
+$pink: #e83e8c !default;
+$red: #ed4040 !default;
+$orange: #fb9678 !default;
+$yellow: #fec107 !default;
+$green: #00c292 !default;
+$teal: #20c997 !default;
+$cyan: #01c0c8 !default;
+$primary: #ed4040 !default;
+$text-muted: $gray-600 !default;
+
+$colors: (
+  blue: $blue,
+  indigo: $indigo,
+  purple: $purple,
+  pink: $pink,
+  red: $red,
+  orange: $orange,
+  yellow: $yellow,
+  green: $green,
+  teal: $teal,
+  cyan: $cyan,
+  white: $white,
+  gray: $gray-600,
+  gray-dark: $gray-800
+);
+
+$theme-colors: (
+  primary: $blue,
+  secondary: $gray-100,
+  success: $green,
+  info: $blue,
+  warning: $yellow,
+  danger: $red,
+  light: $gray-100,
+  cyan: $cyan,
+  dark: $gray-800,
+  purple: $purple
+);
+
+$body-bg: $gray-100;
+$body-color: $gray-900 !default;
+$jumbotron-bg: $gray-100 !default;
+
+$navbar-brand-padding-y: 10px;
+
+$card-border-width: 0px !default;
+$card-border-radius: 0px !default;
+$enable-shadows: true !default;
+
+.shadow {
+  background: #fc0; /* Цвет фона */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Параметры тени */
+  padding: 10px;
+}
+
+.grow-on-hover {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  transition: 0.3s linear;
+}
+/* Небольшое увеличение при наведение */
+.grow-on-hover:hover {
+  -webkit-transform: scale(1.03);
+  transform: scale(1.03);
+}
+
+body {
+  padding-top: 4.7rem; /*добавляем отступ сверху для зафиксированного навбара*/
+}
+
+@import "bootstrap/scss/bootstrap.scss";
+/*@import "~font-awesome/scss/font-awesome.scss";*/

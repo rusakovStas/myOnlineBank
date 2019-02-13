@@ -1,0 +1,16 @@
+// запускать тесты в паралель нельзя - спринг будет стартовать в каждом форке (а порт один для интеграционных)
+task testApi(type: Test) {
+    useJUnitPlatform()
+    testLogging.showStandardStreams = true
+    include 'api/**/*'
+    exclude 'integration/**/*'
+}
+
+task integrationTest(type: Test) {
+    useJUnitPlatform()
+    testLogging.showStandardStreams = true
+    include 'integration/**/*'
+    exclude 'api/**/*'
+    systemProperty "selenide.baseUrl", System.getProperty("selenide.baseUrl")
+    systemProperty "selenide.browser", System.getProperty("selenide.browser")
+}

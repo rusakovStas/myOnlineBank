@@ -1,0 +1,67 @@
+buildscript {
+	ext {
+		springBootVersion = '2.1.0.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+plugins {
+	id 'java'
+	id 'idea'
+	id "org.springframework.boot" version "2.1.0.RELEASE"
+	id "io.spring.dependency-management" version "1.0.6.RELEASE"
+	id "de.solugo.gradle.nodejs" version "0.6.0"
+	id 'io.qameta.allure' version '2.5'
+}
+
+group = 'com.stasdev'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile("org.springframework.boot:spring-boot-starter-security")
+	compile group: 'org.springframework.security.oauth.boot', name: 'spring-security-oauth2-autoconfigure', version: '2.0.4.RELEASE'
+	compile('org.postgresql:postgresql')
+	compile("org.springframework.boot:spring-boot-starter-actuator")
+	compile("com.h2database:h2")
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+
+	testImplementation('org.junit.jupiter:junit-jupiter-api:5.3.1')
+	testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.3.1')
+
+
+	testImplementation('com.codeborne:selenide:5.0.1')
+
+	testImplementation('io.qameta.allure:allure-selenide:2.8.1')
+	testRuntimeOnly('io.qameta.allure:allure-junit5:2.8.1')
+}
+
+nodejs {
+	version = '10.8.0'
+	rootPath = "${project.projectDir}/../client"
+}
+
+allure {
+	autoconfigure = false
+	version = '2.7.0'
+}
+
+task copyFrontBuildToPublic(type: Copy) {
+	from "${project.projectDir}/../client/build"
+	into "${project.projectDir}/src/main/resources/public"
+}
+
+apply from: rootProject.file('gradle/tests.gradle')

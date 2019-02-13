@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script{
                     try {
-                            sh "createdb var_db"
+                            sh "createdb myonlinebank"
                         }
                          catch (exc) {
                             echo 'is already exist'
@@ -22,14 +22,14 @@ pipeline {
                         try {
                             sh "cd ${workspace}/client && yarn install"
                             sh "cd ${workspace}/client && yarn run build-test"
-                            sh "curl 'http://localhost:var_test_port/actuator/shutdown' -i -X POST"
+                            sh "curl 'http://localhost:3334/actuator/shutdown' -i -X POST"
                         }
                          catch (exc) {
                             echo 'Something failed!'
                             currentBuild.result = "SUCCESS"
                         }
                 }
-                sh "cd server && ./gradlew copyFrontBuildToPublic integrationTest -Dselenide.baseUrl=http://var_host -Dselenide.browser=integration.SelenoidWebDriverProvider"
+                sh "cd server && ./gradlew copyFrontBuildToPublic integrationTest -Dselenide.baseUrl=http://138.68.95.208 -Dselenide.browser=integration.SelenoidWebDriverProvider"
             }
         post {
             always {
@@ -52,7 +52,7 @@ pipeline {
             steps {
             script{
                         try {
-                            sh "curl 'http://localhost:var_port/actuator/shutdown' -i -X POST"
+                            sh "curl 'http://localhost:8888/actuator/shutdown' -i -X POST"
                         }
                          catch (exc) {
                             echo 'Something failed!'

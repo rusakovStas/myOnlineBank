@@ -22,12 +22,12 @@
     "validator": "^10.7.0"
   },
   "scripts": {
-    "start": "REACT_APP_URL=localhost REACT_APP_HOST=var_port react-scripts start",
-    "build": "REACT_APP_URL=var_host REACT_APP_HOST=var_port react-scripts build",
-    "build-test": "REACT_APP_URL=var_host REACT_APP_HOST=var_test_port react-scripts build",
-    "build-dev": "REACT_APP_URL=localhost REACT_APP_HOST=var_test_port react-scripts build",
-    "test": "REACT_APP_URL=var_host REACT_APP_HOST=var_test_port react-scripts test",
-    "eject": "REACT_APP_URL=localhost REACT_APP_HOST=var_test_port react-scripts eject",
+    "start": "REACT_APP_URL=localhost REACT_APP_HOST=8888 react-scripts start",
+    "build": "REACT_APP_URL=138.68.95.208 REACT_APP_HOST=8888 react-scripts build",
+    "build-test": "REACT_APP_URL=138.68.95.208 REACT_APP_HOST=3334 react-scripts build",
+    "build-dev": "REACT_APP_URL=localhost REACT_APP_HOST=3334 react-scripts build",
+    "test": "REACT_APP_URL=138.68.95.208 REACT_APP_HOST=3334 react-scripts test",
+    "eject": "REACT_APP_URL=localhost REACT_APP_HOST=3334 react-scripts eject",
     "lint": "eslint src"
   },
   "eslintConfig": {

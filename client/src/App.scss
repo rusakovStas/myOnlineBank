@@ -22,6 +22,7 @@ $purple: #7015bd !default;
 $pink: #e83e8c !default;
 $red: #ed4040 !default;
 $orange: #fb9678 !default;
+$orangered: #ff4500 !default;
 $yellow: #fec107 !default;
 $green: #00c292 !default;
 $teal: #20c997 !default;
@@ -66,29 +67,147 @@ $navbar-brand-padding-y: 10px;
 
 $card-border-width: 0px !default;
 $card-border-radius: 0px !default;
-$enable-shadows: true !default;
+
+$list-group-border-radius: 0px !default;
 
 .shadow {
   background: #fc0; /* Цвет фона */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Параметры тени */
   padding: 10px;
 }
-
-.grow-on-hover {
+.grow-or-fall {
   position: relative;
-  z-index: 2;
   cursor: pointer;
   transition: 0.3s linear;
 }
-/* Небольшое увеличение при наведение */
-.grow-on-hover:hover {
-  -webkit-transform: scale(1.03);
-  transform: scale(1.03);
+.grow-on-hover {
+  @extend .grow-or-fall;
 }
 
-body {
-  padding-top: 4.7rem; /*добавляем отступ сверху для зафиксированного навбара*/
+.fall-on-hover {
+  @extend .grow-or-fall;
+}
+/* Небольшое увеличение при наведение */
+.grow-on-hover:hover {
+  z-index: 2;
+  -webkit-transform: scale(1.02);
+  transform: scale(1.02);
+}
+
+.fall-on-hover:hover {
+  -webkit-transform: scale(0.98);
+  transform: scale(0.98);
+}
+
+.border-bottom {
+  border-bottom: 1px solid #e9ecef !important;
+}
+
+section {
+  width: 100%;
+  max-width: none;
+  text-align: center;
+  background-color: $gray-100;
+  height: 110vh;
+  color: black;
+}
+
+.intro-section {
+  background-color: $gray-800;
+  height: calc(
+    100vh - 4rem
+  ); /*вычисляем высоту экрана с учетом navbar в responsive еденицах*/
+  color: white;
+}
+
+.input-in-card-header {
+  background-color: $gray-800;
+}
+
+.account-section {
+  background-color: $orangered;
+  color: white;
+}
+
+.star-enter {
+  /*transform: translateX(-200px);*/
+  -webkit-animation: swing 1s ease;
+  animation: swing 1s ease;
+  -webkit-animation-iteration-count: 1;
+  animation-iteration-count: 1;
+}
+.star-enter-active {
+  /*  -webkit-animation: swing 1s ease;
+  animation: swing 1s ease;
+  -webkit-animation-iteration-count: 1;
+  animation-iteration-count: 1;*/
+}
+.star-exit {
+  /*transform: translateX(200px);*/
+  /*transition: all 1.5s ease;*/
+  -webkit-animation: swing 1s ease;
+  animation: swing 1s ease;
+  -webkit-animation-iteration-count: 1;
+  animation-iteration-count: 1;
+}
+.star-exit-active {
+  -webkit-animation: swing 1s ease;
+  animation: swing 1s ease;
+  -webkit-animation-iteration-count: 1;
+  animation-iteration-count: 1;
+}
+
+@-webkit-keyframes swing {
+  15% {
+    -webkit-transform: translateX(5px);
+    transform: translateX(5px);
+  }
+  30% {
+    -webkit-transform: translateX(5px);
+    transform: translateX(5px);
+  }
+  50% {
+    -webkit-transform: translateX(3px);
+    transform: translateX(3px);
+  }
+  65% {
+    -webkit-transform: translateX(3px);
+    transform: translateX(3px);
+  }
+  80% {
+    -webkit-transform: translateX(2px);
+    transform: translateX(2px);
+  }
+  100% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+}
+@keyframes swing {
+  15% {
+    -webkit-transform: translateX(5px);
+    transform: translateX(5px);
+  }
+  30% {
+    -webkit-transform: translateX(5px);
+    transform: translateX(5px);
+  }
+  50% {
+    -webkit-transform: translateX(3px);
+    transform: translateX(3px);
+  }
+  65% {
+    -webkit-transform: translateX(3px);
+    transform: translateX(3px);
+  }
+  80% {
+    -webkit-transform: translateX(2px);
+    transform: translateX(2px);
+  }
+  100% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
 }
 
 @import "bootstrap/scss/bootstrap.scss";
-/*@import "~font-awesome/scss/font-awesome.scss";*/

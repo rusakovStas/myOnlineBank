@@ -1,20 +1,38 @@
 import React from "react";
-import { Container } from "reactstrap";
+import ScrollAnimation from "react-animate-on-scroll";
 
 const HomePage = () => (
-	<Container>
-		<h1>Home Page</h1>
-		<p>
-			Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-			nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
-			erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
-			et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
-			Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur
-			sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
-			et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
-			nulla facilisis at vero eros et accumsan et iusto odio dignissim qui
-		</p>
-	</Container>
+	<div>
+		<section className="intro-section">
+			<div className="row h-100">
+				<div className="col-sm-12 my-auto">
+					<h1>Welcome to innovation online bank!</h1>
+				</div>
+				<div className="col-sm-12 mt-auto">
+					<h6>Scrool below to see instruction</h6>
+				</div>
+			</div>
+		</section>
+
+		<section className="account-section">
+			<div className="row h-100">
+				<div className="col-sm-12 my-auto">
+					<ScrollAnimation animateIn="fadeIn">
+						<h1>Instruction for Accounts tab</h1>
+					</ScrollAnimation>
+				</div>
+			</div>
+		</section>
+		<section>
+			<div className="row h-100">
+				<div className="col-sm-12 my-auto">
+					<ScrollAnimation animateIn="fadeIn">
+						<h1>Instruction for Admin tab</h1>
+					</ScrollAnimation>
+				</div>
+			</div>
+		</section>
+	</div>
 );
 
 export default HomePage;

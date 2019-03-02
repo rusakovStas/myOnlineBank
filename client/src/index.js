@@ -11,7 +11,8 @@ import setAuthToken from "./utils/setAuthToken";
 import { userLoggedIn, userLoggedOut } from "./actions/auth";
 import App from "./App";
 import "./App.scss";
-import "font-awesome/css/font-awesome.min.css";
+import "animate.css/animate.min.css";
+import "react-bootstrap-typeahead/css/Typeahead.css";
 import * as serviceWorker from "./serviceWorker";
 
 const store = createStore(

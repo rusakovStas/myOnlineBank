@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.byText;
+
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 import static com.codeborne.selenide.Selenide.open;
@@ -67,13 +68,14 @@ public class UsersTest extends CommonUITest {
         $("#username").setValue("user");
         $("#password").setValue("pass");
         $(byText("Add")).click();
-        $(byText("User with name 'user' already exists!"));
+        $(byText("User with name 'user' already exists!")).shouldBe(visible);
         $(".close").click();
 
     }
 
     @Test
     void userCreatedByAdminCanLoginAndNotSeeAdminPage() {
+
         $(byText("Admin")).click();
         $(byText("Add new user")).click();
         $("#username").setValue("User created by admin");

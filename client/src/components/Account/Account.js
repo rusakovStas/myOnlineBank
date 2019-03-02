@@ -10,7 +10,6 @@ import {
 	Col,
 	Input
 } from "reactstrap";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Typeahead } from "react-bootstrap-typeahead";
 
@@ -85,7 +84,6 @@ class Account extends React.Component {
 				confirm: false,
 				transaction: false,
 
-				
 				openTransaction: false
 			});
 		}
@@ -110,6 +108,7 @@ class Account extends React.Component {
 						{account.number}
 					</div>
 				</CardBody>
+
 				<Collapse isOpen={open}>
 					<Collapse isOpen={openTransaction}>
 						<FontAwesomeIcon icon="arrow-down" size="2x" />
@@ -123,70 +122,65 @@ class Account extends React.Component {
 							/>
 						</CardBody>
 					</Collapse>
-					<CSSTransition
-						in={!confirm}
-						timeout={300}
-						classNames="star"
-					>
-						{!confirm ? (
-							<Row>
-								<Col xs="6" sm="4">
-									<Button
-										size="lg"
-										block
-										color="danger"
-										className="mb-2"
-										onClick={this.toggleBlock}
-									>
-										Block
-									</Button>
-								</Col>
-								<Col xs="6" sm="4">
-									<Button
-										size="lg"
-										block
-										color="success"
-										onClick={this.toggleEdit}
-									>
-										Edite
-									</Button>
-								</Col>
-								<Col sm="4">
-									<Button
-										size="lg"
-										block
-										color="primary"
-										onClick={this.toggleTransaction}
-									>
-										Transaction
-									</Button>
-								</Col>
-							</Row>
-						) : (
-							<Row>
-								<Col xs="6">
-									<Button
-										size="lg"
-										block
-										color="success"
-										onClick={this.accept}
-									>
-										Accept
-									</Button>
-								</Col>
-								<Col xs="6">
-									<Button
-										size="lg"
-										block
-										color="danger"
-										onClick={this.decline}
-									>
-										Decline
-									</Button>
-								</Col>
-							</Row>
-						)}
-					</CSSTransition>
+
+					{!confirm ? (
+						<Row>
+							<Col xs="6" sm="4">
+								<Button
+									size="lg"
+									block
+									color="danger"
+									className="mb-2"
+									onClick={this.toggleBlock}
+								>
+									Block
+								</Button>
+							</Col>
+							<Col xs="6" sm="4">
+								<Button
+									size="lg"
+									block
+									color="success"
+									onClick={this.toggleEdit}
+								>
+									Edite
+								</Button>
+							</Col>
+							<Col sm="4">
+								<Button
+									size="lg"
+									block
+									color="primary"
+									onClick={this.toggleTransaction}
+								>
+									Transaction
+								</Button>
+							</Col>
+						</Row>
+					) : (
+						<Row>
+							<Col xs="6">
+								<Button
+									size="lg"
+									block
+									color="success"
+									onClick={this.accept}
+								>
+									Accept
+								</Button>
+							</Col>
+							<Col xs="6">
+								<Button
+									size="lg"
+									block
+									color="danger"
+									onClick={this.decline}
+								>
+									Decline
+								</Button>
+							</Col>
+						</Row>
+					)}
 				</Collapse>
 			</Card>
 		);

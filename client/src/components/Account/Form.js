@@ -5,7 +5,7 @@ import Account from "./Account";
 class AccountForm extends React.Component {
 	state = {
 		accounts: [
-			{ number: "4876 **** **** 1231", name: "Grandma", index: 0 },
+			{ number: "4876 **** **** 1231", index: 0 },
 			{ number: "4876 **** **** 1231", name: "Common", index: 1 },
 			{ number: "4876 **** **** 1231", name: "Love account", index: 2 }
 		],
@@ -57,7 +57,7 @@ class AccountForm extends React.Component {
 					<h1>Accounts</h1>
 					<ListGroup>
 						{this.state.accounts.map(acc => (
-							<ListGroupItem>
+							<ListGroupItem className="mb-2  ">
 								<Account
 									account={acc}
 									open={this.state.collapse === acc.index}

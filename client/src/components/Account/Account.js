@@ -7,8 +7,7 @@ import {
 	CardHeader,
 	Button,
 	Row,
-	Col,
-	Input
+	Col
 } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Typeahead } from "react-bootstrap-typeahead";
@@ -20,6 +19,26 @@ class Account extends React.Component {
 		transaction: false,
 		edite: false,
 		block: false
+	};
+
+	constructor(props) {
+		super(props);
+		// create a ref to store the button DOM element
+		this.inputForName = React.createRef();
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (!prevState.edite && this.state.edite) {
+			this.focus();
+		}
+	}
+
+	handleFocus = event => {
+		event.target.select();
+	};
+
+	focus = () => {
+		this.inputForName.current.focus();
 	};
 
 	toggleTransaction = () => {
@@ -83,7 +102,6 @@ class Account extends React.Component {
 			this.setState({
 				confirm: false,
 				transaction: false,
-
 				openTransaction: false
 			});
 		}
@@ -91,17 +109,19 @@ class Account extends React.Component {
 
 	render() {
 		const { account, open, toggle, suggestions } = this.props;
-		const { openTransaction, confirm } = this.state;
+		const { openTransaction, confirm, edite } = this.state;
 		return (
 			<Card className="text-center">
-				{!!account.name && (
-					<CardBody onClick={() => toggle(account.index)}>
-						<Input
+				{(!!account.name || edite) && (
+					<CardHeader>
+						<input
 							value={account.name}
-							disabled
-							className="border-0"
+							disabled={this.state.edite === false}
+							ref={this.inputForName}
+							onFocus={this.handleFocus}
+							className="border-0 form-input form-control"
 						/>
-					</CardBody>
+					</CardHeader>
 				)}
 				<CardBody onClick={() => toggle(account.index)}>
 					<div className="alert alert-primary" role="alert">
@@ -118,6 +138,7 @@ class Account extends React.Component {
 								multiple={false}
 								options={suggestions}
 								placeholder="Type a email"
+								onFocus={this.handleFocus}
 								className="mb-2"
 							/>
 						</CardBody>

@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faArrowDown } from "@fortawesome/free-solid-svg-icons";
+import { faArrowDown, faRubleSign } from "@fortawesome/free-solid-svg-icons";
 import HomePage from "./components/Home/Page";
 import LoginPage from "./components/Login/Page";
 import UserPage from "./components/User/Page";
@@ -12,7 +12,7 @@ import UserRoute from "./components/commons/UserRoute";
 import TopNavigationBar from "./components/commons/TopNavigationBar";
 import AccountPage from "./components/Account/Page";
 
-library.add(faArrowDown);
+library.add(faArrowDown, faRubleSign);
 
 const App = ({ location, isAuthentifacated }) => (
   <div>

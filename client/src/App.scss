@@ -24,7 +24,7 @@ $red: #ed4040 !default;
 $orange: #fb9678 !default;
 $orangered: #ff4500 !default;
 $yellow: #fec107 !default;
-$green: #00c292 !default;
+$green: #17e832 !default;
 $teal: #20c997 !default;
 $cyan: #01c0c8 !default;
 $primary: #ed4040 !default;
@@ -66,14 +66,13 @@ $jumbotron-bg: $gray-100 !default;
 $navbar-brand-padding-y: 10px;
 
 $card-border-width: 0px !default;
-$card-border-radius: 0px !default;
-
-$list-group-border-radius: 0px !default;
+$card-border-radius: 5px !default;
+$alert-border-radius: 0px !default;
 
 .shadow {
   background: #fc0; /* Цвет фона */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Параметры тени */
-  padding: 10px;
+  /*padding: 10px;*/
 }
 
 .grow-or-fall {
@@ -113,6 +112,32 @@ section {
   color: black;
 }
 
+.account-item {
+  background: linear-gradient(to bottom right, $gray-800, $gray-900) !important;
+  /*Cover with cat*/
+  /*background: url(./components/Account/cat.jpg);*/
+  /*Dark simple cover with gradient*/
+  /*  background: linear-gradient(
+      45deg,
+      rgba(103, 0, 31, 0.8),
+      rgba(34, 101, 163, 0.5)
+    ),
+    url(./components/Account/cover.jpg);*/
+  /*Cover with flowers*/
+  /*  background: linear-gradient(
+      45deg,
+      rgba(103, 0, 31, 0.8),
+      rgba(34, 101, 163, 0.5)
+    ),
+    url(./components/Account/cover_flowers.jpg);*/
+  border-radius: 10px;
+  background-size: cover;
+}
+
+.input-in-header {
+  background: transparent !important;
+}
+
 .intro-section {
   background-color: $gray-800;
   height: calc(
@@ -121,17 +146,37 @@ section {
   color: white;
 }
 
-.form-control:disabled {
-  background-color: #f7f7f7 !important;
-}
-
 .account-section {
   background-color: $orangered;
   color: white;
 }
 
-input:focus {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) !important; /* Параметры тени */
+@import "bootstrap/scss/bootstrap.scss";
+
+html {
+  font-size: 1rem;
 }
 
-@import "bootstrap/scss/bootstrap.scss";
+@include media-breakpoint-up(sm) {
+  html {
+    font-size: 1.4rem;
+  }
+}
+
+@include media-breakpoint-up(md) {
+  html {
+    font-size: 1.4rem;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  html {
+    font-size: 1rem;
+  }
+  .card {
+    font-size: 1.6rem;
+  }
+  .card-title {
+    font-size: 1.6rem;
+  }
+}

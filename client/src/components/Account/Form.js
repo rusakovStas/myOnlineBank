@@ -1,13 +1,30 @@
 import React from "react";
-import { Container, ListGroup, ListGroupItem } from "reactstrap";
+import { Container, Row, Col, Jumbotron } from "reactstrap";
 import Account from "./Account";
 
 class AccountForm extends React.Component {
 	state = {
 		accounts: [
-			{ number: "4876 **** **** 1231", index: 0 },
-			{ number: "4876 **** **** 1231", name: "Common", index: 1 },
-			{ number: "4876 **** **** 1231", name: "Love account", index: 2 }
+			{
+				number: "4876 1323 2343 1231",
+				owner: "user",
+				amount: "1000",
+				index: 0
+			},
+			{
+				number: "4876 1323 2343 1231",
+				owner: "user",
+				name: "Common",
+				amount: "1000",
+				index: 1
+			},
+			{
+				number: "4876 1323 2343 1231",
+				owner: "user",
+				name: "Love account",
+				amount: "1000",
+				index: 2
+			}
 		],
 		suggestions: [
 			{
@@ -54,19 +71,30 @@ class AccountForm extends React.Component {
 		return (
 			<div>
 				<Container>
-					<h1>Accounts</h1>
-					<ListGroup>
+					<Jumbotron className="d-flex justify-content-center p-0">
+						<h1 className="display-4">Accounts</h1>
+					</Jumbotron>
+					<Row>
+						<Col
+							sm="12"
+							md={{ size: 10, offset: 1 }}
+							className="mb-2 mt-2"
+						/>
 						{this.state.accounts.map(acc => (
-							<ListGroupItem className="mb-2  ">
+							<Col
+								sm="12"
+								md={{ size: 10, offset: 1 }}
+								className="mb-1"
+							>
 								<Account
 									account={acc}
 									open={this.state.collapse === acc.index}
 									toggle={this.toggle}
 									suggestions={this.state.suggestions}
 								/>
-							</ListGroupItem>
+							</Col>
 						))}
-					</ListGroup>
+					</Row>
 				</Container>
 			</div>
 		);

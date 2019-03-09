@@ -44,8 +44,8 @@ public class UsersServiceImpl implements UsersService {
         return repository.saveAndFlush(
                 new ApplicationUser(user.getUsername(),
                 bCryptPasswordEncoder.encode(user.getPassword()),
-                Collections.singleton(userRole),
-                        Collections.singleton())
+                Collections.singleton(userRole))
+//                        Collections.singleton())
         );
     }
 

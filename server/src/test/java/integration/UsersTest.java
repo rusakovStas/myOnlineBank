@@ -75,7 +75,6 @@ public class UsersTest extends CommonUITest {
 
     @Test
     void userCreatedByAdminCanLoginAndNotSeeAdminPage() {
-
         $(byText("Admin")).click();
         $(byText("Add new user")).click();
         $("#username").setValue("User created by admin");

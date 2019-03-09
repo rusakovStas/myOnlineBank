@@ -118,124 +118,137 @@ class Account extends React.Component {
 		const { account, open, toggle, suggestions } = this.props;
 		const { openTransaction, confirm, edite, block, loading } = this.state;
 		return (
-			<Card className="text-center text-white account-item shadow p-2">
-				{(!!account.name || edite) && (
-					<CardTitle>
-						<input
-							value={account.name}
-							disabled={this.state.edite === false}
-							ref={this.inputForName}
-							onFocus={this.handleFocus}
-							className="border-0 form-input form-control input-in-header text-white"
-						/>
-					</CardTitle>
-				)}
-				<CardText onClick={() => toggle(account.index)}>
-					<large>
-						<p>
-							<b className="text-monospace">
-								Amount: {account.amount}
-								<FontAwesomeIcon icon="ruble-sign" size="1x" />
-							</b>
-						</p>
-					</large>
-
-					<p className="text-monospace card-text text-right pl-1 mb-0">
-						<small>
-							<b>{account.number}</b>
-						</small>
-					</p>
-
-					<p className="card-text text-right pl-1 mt-0">
-						<small className="text-muted">
-							Owner: {account.owner}
-						</small>
-					</p>
-				</CardText>
-
-				<Collapse isOpen={open || confirm}>
-					<Collapse isOpen={openTransaction}>
-						<FontAwesomeIcon icon="arrow-down" size="2x" />
-						<CardText className="pl-0 pr-0">
-							<Typeahead
-								labelKey="name"
-								multiple={false}
-								options={suggestions}
-								placeholder="Type a email"
-								className="mb-2"
+			<div>
+				<Card className="text-center text-white account-item shadow p-2">
+					{(!!account.name || edite) && (
+						<CardTitle>
+							<input
+								value={account.name}
+								disabled={this.state.edite === false}
+								ref={this.inputForName}
+								onFocus={this.handleFocus}
+								className="border-0 form-input form-control input-in-header text-white"
 							/>
-						</CardText>
+						</CardTitle>
+					)}
+					<CardText onClick={() => toggle(account.index)}>
+						<large>
+							<p>
+								<b className="text-monospace">
+									Amount: {account.amount}
+									<FontAwesomeIcon
+										icon="ruble-sign"
+										size="1x"
+									/>
+								</b>
+							</p>
+						</large>
+
+						<p className="text-monospace card-text text-right pl-1 mb-0">
+							<small>
+								<b>{account.number}</b>
+							</small>
+						</p>
+
+						<p className="card-text text-right pl-1 mt-0">
+							<small className="text-muted">
+								Owner: {account.owner}
+							</small>
+						</p>
+					</CardText>
+
+					<Collapse isOpen={open || confirm}>
+						<Collapse isOpen={openTransaction}>
+							<FontAwesomeIcon icon="arrow-down" size="2x" />
+							<CardText className="pl-0 pr-0">
+								<Typeahead
+									labelKey="name"
+									multiple={false}
+									options={suggestions}
+									placeholder="Type a email"
+									className="mb-2"
+								/>
+							</CardText>
+						</Collapse>
+						<Collapse isOpen={block}>
+							<CardText className="text-danger">
+								<b>
+									Are you sure you want to block the account?
+								</b>
+							</CardText>
+						</Collapse>
+						<div className="m-1">
+							{!confirm ? (
+								<Row>
+									<Col xs="6" sm="4">
+										<Button
+											size="lg"
+											block
+											color="danger"
+											className="mb-2"
+											onClick={this.toggleBlock}
+										>
+											Block
+										</Button>
+									</Col>
+									<Col xs="6" sm="4">
+										<Button
+											size="lg"
+											block
+											color="success"
+											onClick={this.toggleEdit}
+										>
+											{!!account.name ||
+											account.name === ""
+												? "Edite"
+												: "Name"}
+										</Button>
+									</Col>
+									<Col sm="4">
+										<Button
+											size="lg"
+											block
+											color="purple"
+											onClick={this.toggleTransaction}
+										>
+											Transaction
+										</Button>
+									</Col>
+								</Row>
+							) : (
+								<Row>
+									<Col xs="6">
+										<FormButton
+											loading={loading}
+											variant="success"
+											block
+											size="lg"
+											submit={this.accept}
+										>
+											Accept
+										</FormButton>
+									</Col>
+									<Col xs="6">
+										<Button
+											size="lg"
+											block
+											color="danger"
+											onClick={this.decline}
+										>
+											Decline
+										</Button>
+									</Col>
+								</Row>
+							)}
+						</div>
 					</Collapse>
-					<Collapse isOpen={block}>
-						<CardText className="text-danger">
-							<b>Are you sure you want to block the account?</b>
-						</CardText>
-					</Collapse>
-					<div className="m-1">
-						{!confirm ? (
-							<Row>
-								<Col xs="6" sm="4">
-									<Button
-										size="lg"
-										block
-										color="danger"
-										className="mb-2"
-										onClick={this.toggleBlock}
-									>
-										Block
-									</Button>
-								</Col>
-								<Col xs="6" sm="4">
-									<Button
-										size="lg"
-										block
-										color="success"
-										onClick={this.toggleEdit}
-									>
-										{!!account.name || account.name === ""
-											? "Edite"
-											: "Name"}
-									</Button>
-								</Col>
-								<Col sm="4">
-									<Button
-										size="lg"
-										block
-										color="purple"
-										onClick={this.toggleTransaction}
-									>
-										Transaction
-									</Button>
-								</Col>
-							</Row>
-						) : (
-							<Row>
-								<Col xs="6">
-									<FormButton
-										loading={loading}
-										variant="success"
-										block
-										size="lg"
-										submit={this.accept}
-									>
-										Accept
-									</FormButton>
-								</Col>
-								<Col xs="6">
-									<Button
-										size="lg"
-										block
-										color="danger"
-										onClick={this.decline}
-									>
-										Decline
-									</Button>
-								</Col>
-							</Row>
-						)}
-					</div>
-				</Collapse>
-			</Card>
+				</Card>
+				<div className="fixed-bottom d-flex justify-content-center p-3">
+					<Button size="lg" color="primary">
+						Add new account
+					</Button>
+				</div>
+			</div>
 		);
 	}
 }

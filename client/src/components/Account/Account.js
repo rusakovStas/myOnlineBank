@@ -4,16 +4,11 @@ import {
 	Collapse,
 	CardText,
 	Card,
-	CardHeader,
 	Button,
 	Row,
 	Col,
-	CardImg,
-	CardImgOverlay,
-	CardTitle,
-	Alert
+	CardTitle
 } from "reactstrap";
-import cover from "./cover.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Typeahead } from "react-bootstrap-typeahead";
 import FormButton from "../commons/FormButton";
@@ -188,7 +183,7 @@ class Account extends React.Component {
 											className="mb-2"
 											onClick={this.toggleBlock}
 										>
-											Block
+											Delete
 										</Button>
 									</Col>
 									<Col xs="6" sm="4">

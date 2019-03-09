@@ -8,7 +8,7 @@ import java.util.Set;
 public class ApplicationUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long user_id;
     private String username;
     private String password;
@@ -20,6 +20,24 @@ public class ApplicationUser {
             inverseJoinColumns = { @JoinColumn(name = "role_id") }
     )
     private Set<Role> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<Account> accounts;
+
+    public Set<Account> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(Set<Account> accounts) {
+        this.accounts = accounts;
+    }
+
+    public ApplicationUser(String username, String password, Set<Role> roles, Set<Account> accounts) {
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+        this.accounts = accounts;
+    }
 
     public ApplicationUser(String s, String pass, Set<Role> roles) {
         this.username = s;

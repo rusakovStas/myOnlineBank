@@ -90,4 +90,13 @@ class AccountsControllerTest extends CommonApiTest {
         throw new NotImplementedYet("Not implemented");
     }
 
+    @Test
+    void adminCanDeleteAnyAccount() {
+        throw new NotImplementedYet("Not implemented");
+    }
+
+    @Test
+    void adminHasDefaultAccountWithInfinityAmount() {
+        throw new NotImplementedYet("Not implemented");
+    }
 }

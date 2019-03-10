@@ -11,37 +11,56 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-    private ApplicationUser userFrom;
-    private Long idFrom;
-    private Long idTo;
+    private String userFrom;
+    private Long accountIdFrom;
+    private String accountNumberFrom;
+    private String accountNumberTo;
+    private Long accountIdTo;
+
+    public String getAccountNumberFrom() {
+        return accountNumberFrom;
+    }
+
+    public void setAccountNumberFrom(String accountNumberFrom) {
+        this.accountNumberFrom = accountNumberFrom;
+    }
+
+    public String getAccountNumberTo() {
+        return accountNumberTo;
+    }
+
+    public void setAccountNumberTo(String accountNumberTo) {
+        this.accountNumberTo = accountNumberTo;
+    }
+
     private Amount amount;
-    private ApplicationUser userTo;
+    private String userTo;
 
     public Transaction() {
     }
 
-    public ApplicationUser getUserFrom() {
+    public String getUserFrom() {
         return userFrom;
     }
 
-    public void setUserFrom(ApplicationUser userFrom) {
+    public void setUserFrom(String userFrom) {
         this.userFrom = userFrom;
     }
 
-    public Long getIdFrom() {
-        return idFrom;
+    public Long getAccountIdFrom() {
+        return accountIdFrom;
     }
 
-    public void setIdFrom(Long idFrom) {
-        this.idFrom = idFrom;
+    public void setAccountIdFrom(Long accountIdFrom) {
+        this.accountIdFrom = accountIdFrom;
     }
 
-    public Long getIdTo() {
-        return idTo;
+    public Long getAccountIdTo() {
+        return accountIdTo;
     }
 
-    public void setIdTo(Long idTo) {
-        this.idTo = idTo;
+    public void setAccountIdTo(Long accountIdTo) {
+        this.accountIdTo = accountIdTo;
     }
 
     public Amount getAmount() {
@@ -52,11 +71,11 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public ApplicationUser getUserTo() {
+    public String getUserTo() {
         return userTo;
     }
 
-    public void setUserTo(ApplicationUser userTo) {
+    public void setUserTo(String userTo) {
         this.userTo = userTo;
     }
 }

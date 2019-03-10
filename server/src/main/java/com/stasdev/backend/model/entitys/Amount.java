@@ -1,8 +1,10 @@
 package com.stasdev.backend.model.entitys;
 
 
+import javax.persistence.Embeddable;
 import java.math.BigDecimal;
 
+@Embeddable
 public class Amount {
 
     private String currency;

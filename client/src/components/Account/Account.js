@@ -183,7 +183,7 @@ class Account extends React.Component {
 											className="mb-2"
 											onClick={this.toggleBlock}
 										>
-											Delete
+											Block
 										</Button>
 									</Col>
 									<Col xs="6" sm="4">

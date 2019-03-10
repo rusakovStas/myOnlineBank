@@ -28,15 +28,10 @@ import static com.codeborne.selenide.Selenide.open;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)//Это необходимо что бы BeforeAll выполнялся после старта спринга (потому что будет выполняться только при создание инстанса тестового класса)
 public abstract class CommonUITest {
 
-    private static int appPort = TestProperties.getInstance().getAppPort();
-
+//  Эти методы выполняются в отдельных потоках (при паралелльном запуске) поэтому сюда не следует помещать open
     @BeforeAll
     static void setUp() {
         SelenideLogger.addListener("allure", new AllureSelenide());
-        Configuration.baseUrl = Configuration.baseUrl
-                .replace(":8080", "")
-                .replace("http://","");
-        open(String.format("http://%s:%d", Configuration.baseUrl, appPort));
     }
 
     @AfterAll

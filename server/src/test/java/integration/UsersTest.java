@@ -17,6 +17,13 @@ public class UsersTest extends CommonUITest {
 
     @BeforeEach
     void login(){
+        int appPort = TestProperties.getInstance().getAppPort();
+        Configuration.baseUrl = Configuration.baseUrl
+                .replace(":8080", "")
+                .replace("http://","");
+//      Эта команда откроет только один браузер в одном потоке, т.е. переоткрываться не будет при каждом тесте
+        open(String.format("http://%s:%d", Configuration.baseUrl, appPort));
+
         Selenide.clearBrowserLocalStorage();
         Configuration.timeout = 10_000;
         $("#email").setValue("admin");

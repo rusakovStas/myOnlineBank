@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 
 @Entity
 public class Transaction {
@@ -16,6 +17,24 @@ public class Transaction {
     private String accountNumberFrom;
     private String accountNumberTo;
     private Long accountIdTo;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
+
+    public LocalDateTime getEndDateTime() {
+        return endDateTime;
+    }
+
+    public void setEndDateTime(LocalDateTime endDateTime) {
+        this.endDateTime = endDateTime;
+    }
+
+    public LocalDateTime getStartDateTime() {
+        return startDateTime;
+    }
+
+    public void setStartDateTime(LocalDateTime startDateTime) {
+        this.startDateTime = startDateTime;
+    }
 
     public String getAccountNumberFrom() {
         return accountNumberFrom;

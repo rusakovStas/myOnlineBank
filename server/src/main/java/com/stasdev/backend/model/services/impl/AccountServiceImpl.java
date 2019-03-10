@@ -5,6 +5,7 @@ import com.stasdev.backend.errors.NotImplementedYet;
 import com.stasdev.backend.errors.ThereIsNoAccountsWithId;
 import com.stasdev.backend.model.entitys.Account;
 import com.stasdev.backend.model.entitys.Amount;
+import com.stasdev.backend.model.entitys.ApplicationUser;
 import com.stasdev.backend.model.entitys.Transaction;
 import com.stasdev.backend.model.repos.AccountRepository;
 import com.stasdev.backend.model.repos.ApplicationUserRepository;
@@ -17,14 +18,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
-@RequestMapping("/accounts")
 public class AccountServiceImpl {
 
-    public static final String NO_ACCOUNTS_WITH_ID = "No accounts with id %d";
-    public static final String ON_ACCOUNT_NOT_ENOUGH_MONEY = "On account with number %s amount of money is %s and that not enough for transaction with amount %s";
+    private static final String NO_ACCOUNTS_WITH_ID = "No accounts with id %d";
+    private static final String ON_ACCOUNT_NOT_ENOUGH_MONEY = "On account with number %s amount of money is %s and that not enough for transaction with amount %s";
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final ApplicationUserRepository userRepository;
@@ -36,36 +37,32 @@ public class AccountServiceImpl {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/all")
     List<Account> getAll(){
         return null;
     }
 
-    @GetMapping("/my")
     List<Account> getMyAccount(Authentication authentication){
         String name = authentication.getName();
-
-        return null;
+        ApplicationUser byUsername = userRepository.findByUsername(name);
+        return accountRepository
+                .findAccountsByUser(byUsername)
+                .orElse(Collections.emptyList());
     }
 
-    @PostMapping("/create")
-    Account createAccount(@RequestBody Account account){
+    Account createAccount(Account account){
         throw new NotImplementedYet("Operation 'Create' not implemented yet");
     }
 
-    @PostMapping("/name")
-    Account nameAccount(@RequestBody Account account){
+    Account nameAccount(Account account){
         return null;
     }
 
-    @DeleteMapping("/delete/{id}")
-    void deleteAccount(@PathVariable Long id){
+    void deleteAccount(Long id){
 
     }
 
-    @PostMapping("/transaction")
     @Transactional
-    void transaction(@RequestBody Transaction transaction){
+    void transaction(Transaction transaction){
         transaction.setStartDateTime(LocalDateTime.now());
         try {
             Account accountFrom = accountRepository

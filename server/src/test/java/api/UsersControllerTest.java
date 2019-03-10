@@ -2,8 +2,10 @@ package api;
 
 import com.stasdev.backend.model.entitys.ApplicationUser;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RequestCallback;
 
 import java.util.List;
 import java.util.Map;
@@ -22,14 +24,14 @@ class UsersControllerTest extends CommonApiTest{
 
     @Test
     void allEndpointsSecured() {
-        ResponseEntity<String> all = nonAuth().restClientWithoutErrorHandler().getForEntity("/users/all", String.class);
-        assertThat(all.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+        ResponseEntity<String> allUsers = nonAuth().restClientWithoutErrorHandler().getForEntity("/users/all", String.class);
+        assertThat(allUsers.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
 
-        ResponseEntity<String> create = nonAuth().restClientWithoutErrorHandler().getForEntity("/users/create", String.class);
-        assertThat(create.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+        ResponseEntity<String> createUser = nonAuth().restClientWithoutErrorHandler().postForEntity("/users/create",null ,String.class);
+        assertThat(createUser.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
 
-        ResponseEntity<String> delete = nonAuth().restClientWithoutErrorHandler().getForEntity("/users/delete", String.class);
-        assertThat(delete.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+        ResponseEntity<String> deleteUser = nonAuth().restClientWithoutErrorHandler().getForEntity("/users/delete", String.class);
+        assertThat(deleteUser.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
     }
 
 

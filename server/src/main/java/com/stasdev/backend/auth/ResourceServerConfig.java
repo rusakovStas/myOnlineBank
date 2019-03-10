@@ -49,6 +49,10 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .antMatchers("/users/all").hasRole("ADMIN")
                 .antMatchers("/users/create").hasRole("ADMIN")
                 .antMatchers("/users/delete/**").hasRole("ADMIN")
+                .antMatchers("/accounts/all").hasRole("ADMIN")
+                .antMatchers("/accounts/create").hasRole("ADMIN")
+                .antMatchers("/accounts/my").hasAnyRole("ADMIN", "USER")
+                .antMatchers("/accounts/transaction").hasAnyRole("ADMIN", "USER")
 //                    .anyRequest().authenticated() //все что не указано явным образом - требует авторизации - почему то закрывает ресурсы с сайтом тоже
                 .and()
                 .exceptionHandling()

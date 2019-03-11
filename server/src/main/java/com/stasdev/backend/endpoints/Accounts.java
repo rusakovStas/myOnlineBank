@@ -2,6 +2,7 @@ package com.stasdev.backend.endpoints;
 
 import com.stasdev.backend.errors.NotImplementedYet;
 import com.stasdev.backend.model.entitys.Account;
+import com.stasdev.backend.model.entitys.Suggestion;
 import com.stasdev.backend.model.entitys.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -36,6 +37,15 @@ public class Accounts {
 
     @PostMapping("/transaction")
     void transaction(@RequestBody Transaction transaction){
+
+    }
+
+    @GetMapping("/suggestions")
+    List<Suggestion> getSuggestion(Authentication authentication){
+        String userName = authentication.getName();
+
+
+        return null;
 
     }
 }

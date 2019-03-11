@@ -7,7 +7,8 @@ import {
 	Button,
 	Row,
 	Col,
-	CardTitle
+	CardTitle,
+	Input
 } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Typeahead } from "react-bootstrap-typeahead";
@@ -20,7 +21,8 @@ class Account extends React.Component {
 		transaction: false,
 		edite: false,
 		block: false,
-		loading: false
+		loading: false,
+		chosen: []
 	};
 
 	constructor(props) {
@@ -109,9 +111,21 @@ class Account extends React.Component {
 		}
 	};
 
+	handleOptionSelected = option => {
+		console.log(option);
+		this.setState({ chosen: option });
+	};
+
 	render() {
 		const { account, open, toggle, suggestions } = this.props;
-		const { openTransaction, confirm, edite, block, loading } = this.state;
+		const {
+			openTransaction,
+			confirm,
+			edite,
+			block,
+			loading,
+			chosen
+		} = this.state;
 		return (
 			<div>
 				<Card className="text-center text-white account-item shadow p-2">
@@ -157,12 +171,28 @@ class Account extends React.Component {
 							<FontAwesomeIcon icon="arrow-down" size="2x" />
 							<CardText className="pl-0 pr-0">
 								<Typeahead
-									labelKey="name"
-									multiple={false}
+									renderMenuItemChildren={option => (
+										<div>
+											{option.userName}
+											<div>
+												<small>
+													Account: {option.account}
+												</small>
+											</div>
+										</div>
+									)}
+									labelKey={option =>
+										`${
+											option.userName
+										} with account end on ${option.account}`
+									}
 									options={suggestions}
-									placeholder="Type a email"
-									className="mb-2"
+									placeholder="Type user name..."
+									className="pb-2"
+									onChange={this.handleOptionSelected}
+									selected={chosen}
 								/>
+								<Input placeholder="Type amount..." />
 							</CardText>
 						</Collapse>
 						<Collapse isOpen={block}>

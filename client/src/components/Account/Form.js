@@ -28,34 +28,34 @@ class AccountForm extends React.Component {
 		],
 		suggestions: [
 			{
-				name: "Alabama",
-				population: 4780127,
-				capital: "Montgomery",
-				region: "South"
+				userName: "Alabama",
+				account: 4780127,
+				index: 1
 			},
 			{
-				name: "Alaska",
-				population: 710249,
-				capital: "Juneau",
-				region: "West"
+				userName: "Alaska",
+				account: 710249,
+				index: 2
 			},
 			{
-				name: "Arizona",
-				population: 6392307,
-				capital: "Phoenix",
-				region: "West"
+				userName: "Arizona",
+				account: "63***92307",
+				index: 3
 			},
 			{
-				name: "Arkansas",
-				population: 2915958,
-				capital: "Little Rock",
-				region: "South"
+				userName: "Arkansas",
+				account: 2915958,
+				index: 4
 			},
 			{
-				name: "California",
-				population: 37254503,
-				capital: "Sacramento",
-				region: "West"
+				userName: "California",
+				account: 37254503,
+				index: 5
+			},
+			{
+				userName: "California",
+				account: 37254504,
+				index: 6
 			}
 		],
 		collapse: -1

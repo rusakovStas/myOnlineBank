@@ -4,6 +4,7 @@ import com.stasdev.backend.errors.NotImplementedYet;
 import com.stasdev.backend.model.entitys.Account;
 import com.stasdev.backend.model.entitys.Suggestion;
 import com.stasdev.backend.model.entitys.Transaction;
+import com.stasdev.backend.model.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +15,18 @@ import java.util.List;
 @RequestMapping("/accounts")
 public class Accounts {
 
+    @Autowired
+    private AccountService accountService;
+
     @GetMapping("/all")
     List<Account> getAll(){
-        return null;
+        return accountService.getAll();
     }
 
     @GetMapping("/my")
-    List<Account> getMyAccount(Authentication authentication){return null;}
+    List<Account> getMyAccount(Authentication authentication){
+        return accountService.getMyAccount(authentication.getName());
+    }
 
     @PostMapping("/create")
     Account createAccount(@RequestBody Account account){
@@ -37,15 +43,11 @@ public class Accounts {
 
     @PostMapping("/transaction")
     void transaction(@RequestBody Transaction transaction){
-
+        accountService.transaction(transaction);
     }
 
     @GetMapping("/suggestions")
     List<Suggestion> getSuggestion(Authentication authentication){
-        String userName = authentication.getName();
-
-
-        return null;
-
+        return accountService.getSuggestions(authentication.getName());
     }
 }

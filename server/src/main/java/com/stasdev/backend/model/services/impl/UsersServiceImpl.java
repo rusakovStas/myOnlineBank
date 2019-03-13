@@ -4,6 +4,7 @@ import com.stasdev.backend.errors.AdminDeleteForbidden;
 import com.stasdev.backend.errors.UserIsAlreadyExist;
 import com.stasdev.backend.errors.UserNotFound;
 import com.stasdev.backend.model.entitys.Account;
+import com.stasdev.backend.model.entitys.Amount;
 import com.stasdev.backend.model.entitys.ApplicationUser;
 import com.stasdev.backend.model.entitys.Role;
 import com.stasdev.backend.model.repos.AccountRepository;
@@ -14,13 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Service
 public class UsersServiceImpl implements UsersService {
 
+    private static final String INITIAL_AMOUNT_SUM = "1000";
     private final ApplicationUserRepository repository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final RoleRepository roleRepository;
@@ -40,13 +44,17 @@ public class UsersServiceImpl implements UsersService {
             throw new UserIsAlreadyExist(String.format("User with name '%s' already exists!", user.getUsername()));
         }
         Role userRole = roleRepository.findByRole("user").orElse(new Role("user"));
-        accountRepository.saveAndFlush(new Account());
-        return repository.saveAndFlush(
+        ApplicationUser newUser = repository.saveAndFlush(
                 new ApplicationUser(user.getUsername(),
-                bCryptPasswordEncoder.encode(user.getPassword()),
-                Collections.singleton(userRole))
-//                        Collections.singleton())
-        );
+                        bCryptPasswordEncoder.encode(user.getPassword()),
+                        Collections.singleton(userRole)));
+        Account account = new Account(
+                new Amount("RUR", new BigDecimal(INITIAL_AMOUNT_SUM)),
+                "3122 3123 1231 3131", /*TODO сделать генерацию*/
+                "Default",
+                 newUser);
+        accountRepository.saveAndFlush(account);
+        return repository.findByUsername(newUser.getUsername());
     }
 
     @Override

@@ -10,6 +10,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,10 +27,12 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 /*
@@ -43,6 +47,7 @@ import static org.hamcrest.Matchers.not;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)//Это необходимо что бы BeforeAll выполнялся после старта спринга (потому что будет выполняться только при создание инстанса тестового класса)
 abstract class CommonApiTest {
 
+    protected static final String DEFAULT_PASSWORD = "Password";
     @Autowired
     private TestRestTemplate restClient;
 
@@ -132,5 +137,34 @@ abstract class CommonApiTest {
             return testRestTemplate;
         }
     }
+
+    protected void createUserByUser(String createdUser){
+        authUser()
+                .restClientWithErrorHandler()
+                .postForEntity("/users/create", new ApplicationUser(createdUser, DEFAULT_PASSWORD), ApplicationUser.class);
+    }
+
+    protected ResponseEntity<ApplicationUser> createUserByAdmin(String userName){
+        return authAdmin()
+                .restClientWithErrorHandler()
+                .postForEntity("/users/create", new ApplicationUser(userName, DEFAULT_PASSWORD), ApplicationUser.class);
+    }
+
+    protected void checkUserExists(String userName){
+        ResponseEntity<List<ApplicationUser>> allUserRs = authAdmin().restClientWithoutErrorHandler()
+                .exchange("/users/all", HttpMethod.GET,null, new ParameterizedTypeReference<List<ApplicationUser>>(){} );
+        List<ApplicationUser> allUsers = allUserRs.getBody();
+        assert allUsers != null;
+        assertThat(allUsers.stream().anyMatch(u -> u.getUsername().equals(userName)), is(true));
+    }
+
+    protected void checkUserNotExists(String userName){
+        ResponseEntity<List<ApplicationUser>> allUserRs = authAdmin().restClientWithoutErrorHandler()
+                .exchange("/users/all",HttpMethod.GET,null, new ParameterizedTypeReference<List<ApplicationUser>>(){} );
+        List<ApplicationUser> allUsers = allUserRs.getBody();
+        assert allUsers != null;
+        assertThat(allUsers.stream().anyMatch(u -> u.getUsername().equals(userName)), is(false));
+    }
+
 
 }

@@ -2,6 +2,7 @@ package api;
 
 import com.stasdev.backend.model.entitys.ApplicationUser;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -104,40 +105,6 @@ class UsersControllerTest extends CommonApiTest{
                 .restClientWithErrorHandler()
                 .delete("/users/delete/user"));
         assertThat(runtimeException.getMessage(), containsString("Access is denied"));
-    }
-
-
-    private AccessToRestClient createUserByAdminAndAuth(String user){
-        ResponseEntity<ApplicationUser> userRs = authAdmin()
-                .restClientWithErrorHandler()
-                .postForEntity("/users/create", new ApplicationUser(user, "Password"), ApplicationUser.class);
-        return authByUser(userRs.getBody().getUsername(), "Password");
-    }
-
-    private void createUserByUser(String createdUser){
-        authUser()
-                .restClientWithErrorHandler()
-                .postForEntity("/users/create", new ApplicationUser(createdUser, "Password"), ApplicationUser.class);
-    }
-
-    private ResponseEntity<ApplicationUser> createUserByAdmin(String userName){
-        return authAdmin()
-                .restClientWithErrorHandler()
-                .postForEntity("/users/create", new ApplicationUser(userName, "Password"), ApplicationUser.class);
-    }
-
-    private void checkUserExists(String userName){
-        ResponseEntity<List> allUserRs = authAdmin().restClientWithoutErrorHandler()
-                .getForEntity("/users/all", List.class);
-        List<Map<String, String>> allUsers = allUserRs.getBody();
-        assertThat(allUsers.stream().filter(m -> m.containsValue(userName)).findAny().isPresent(), is(true));
-    }
-
-    private void checkUserNotExists(String userName){
-        ResponseEntity<List> allUserRs = authAdmin().restClientWithoutErrorHandler()
-                .getForEntity("/users/all", List.class);
-        List<Map<String, String>> allUsers = allUserRs.getBody();
-        assertThat(allUsers.stream().filter(m -> m.containsValue(userName)).findAny().isPresent(), is(false));
     }
 
 }

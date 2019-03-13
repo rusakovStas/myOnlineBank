@@ -9,12 +9,19 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     private Amount amount;
-    private String number; /*TODO сделать автогенерацию и маскирование*/
+    private String number; /*TODO сделать автогенерацию */
     private String name;
 
     @ManyToOne
     @JoinColumn(name="user_id")
     private ApplicationUser user;
+
+    public Account(Amount amount, String number, String accountName, ApplicationUser user) {
+        this.amount = amount;
+        this.number = number;
+        this.name = accountName;
+        this.user = user;
+    }
 
     public Account() {
     }
@@ -49,5 +56,9 @@ public class Account {
 
     public void setUser(ApplicationUser user) {
         this.user = user;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

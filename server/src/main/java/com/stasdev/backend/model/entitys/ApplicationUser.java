@@ -1,5 +1,7 @@
 package com.stasdev.backend.model.entitys;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +23,8 @@ public class ApplicationUser {
     )
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Account> accounts;
 
     public Set<Account> getAccounts() {

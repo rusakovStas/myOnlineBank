@@ -13,6 +13,14 @@ public class Amount implements Comparable<Amount>{
     private String currency = "RUR";
     private BigDecimal sum = new BigDecimal(new BigInteger("1000"), 2);
 
+    public Amount(String currency, BigDecimal sum) {
+        this.currency = currency;
+        this.sum = sum;
+    }
+
+    public Amount() {
+    }
+
     public String getCurrency() {
         return currency;
     }

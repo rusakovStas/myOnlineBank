@@ -1,15 +1,26 @@
 package com.stasdev.backend.model.entitys;
 
+/*
+* Специальный класс через которую мы передаем
+* необходимую для совершения транзакции информацию клиенту
+* */
 public class Suggestion {
 
     private String maskAccountNumber;
     private String userName;
     private Long accountId;
 
-    public Suggestion(String maskAccountNumber, String userName, Long accountId) {
-        this.maskAccountNumber = maskAccountNumber;
+    public Suggestion(String accountNumber, String userName, Long accountId) {
+        this.maskAccountNumber = maskAccount(accountNumber);
         this.userName = userName;
         this.accountId = accountId;
+    }
+
+    public Suggestion() {
+    }
+
+    private String maskAccount(String account){
+        return "*** " + account.split(" ")[3];
     }
 
     public String getMaskAccountNumber() {

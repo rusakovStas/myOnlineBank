@@ -37,8 +37,8 @@ public class Accounts {
     Account nameAccount(@RequestBody Account account){return null;}
 
     @DeleteMapping("/delete/{id}")
-    void deleteAccount(@PathVariable Long id){
-
+    void deleteAccount(Authentication authentication, @PathVariable Long id){
+        accountService.deleteAccount(authentication.getName(), id);
     }
 
     @PostMapping("/transaction")

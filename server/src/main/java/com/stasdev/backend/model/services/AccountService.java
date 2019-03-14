@@ -18,7 +18,7 @@ public interface AccountService {
 
     Account nameAccount(Account account);
 
-    void deleteAccount(Long id);
+    void deleteAccount(String userName, Long id);
 
     void transaction(Transaction transaction);
 }

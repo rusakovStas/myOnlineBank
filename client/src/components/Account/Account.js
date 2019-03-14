@@ -112,7 +112,6 @@ class Account extends React.Component {
 	};
 
 	handleOptionSelected = option => {
-		console.log(option);
 		this.setState({ chosen: option });
 	};
 
@@ -287,7 +286,11 @@ Account.propTypes = {
 		name: PropTypes.string,
 		number: PropTypes.string.isRequired
 	}).isRequired,
-	suggestions: PropTypes.object.isRequired,
+	suggestions: PropTypes.shape({
+		userName: PropTypes.string.isRequired,
+		account: PropTypes.string.isRequired,
+		index: PropTypes.number.isRequired
+	}).isRequired,
 	open: PropTypes.bool.isRequired,
 	toggle: PropTypes.func.isRequired
 };

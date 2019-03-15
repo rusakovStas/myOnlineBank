@@ -80,26 +80,26 @@ public class BackendApplication {
 					new ApplicationUser("admin",
 							bCryptPasswordEncoder.encode("pass"), Collections.singleton(new Role("admin"))));
 			Account account = new Account(
-					new Amount("RUR", new BigDecimal("123")),
+					new Amount("RUR", new BigDecimal("100000")),
 					"3122 3123 1231 3131",
-					"", admin);
-			Account accountTwo = new Account(
-					new Amount("RUR", new BigDecimal("1231")),
-					"3122 3123 1231 1331",
-					"", admin);
+					"God account", admin);
 			accountRepository.saveAndFlush(account);
-			accountRepository.saveAndFlush(accountTwo);
 
 			ApplicationUser user = repo.saveAndFlush(
 					new ApplicationUser("user",
 							bCryptPasswordEncoder.encode("pass"),
 							Collections.singleton(new Role("user"))));
 			Account accountForUser = new Account(
-					new Amount("RUR", new BigDecimal("123")),
+					new Amount("RUR", new BigDecimal("1000")),
 					"3122 3123 1231 3312",
+					"", user);
+			Account accountForUserTwo = new Account(
+					new Amount("RUR", new BigDecimal("10000")),
+					"3122 3123 1231 1331",
 					"", user);
 
 			accountRepository.saveAndFlush(accountForUser);
+			accountRepository.saveAndFlush(accountForUserTwo);
 		}
 	}
 
@@ -125,26 +125,26 @@ public class BackendApplication {
 					new ApplicationUser("admin",
 							bCryptPasswordEncoder.encode("pass"), Collections.singleton(new Role("admin"))));
 			Account account = new Account(
-					new Amount("RUR", new BigDecimal("123")),
+					new Amount("RUR", new BigDecimal("100000")),
 					"3122 3123 1231 3131",
-					"", admin);
-			Account accountTwo = new Account(
-					new Amount("RUR", new BigDecimal("1231")),
-					"3122 3123 1231 1331",
-					"", admin);
+					"God account", admin);
 			accountRepository.saveAndFlush(account);
-			accountRepository.saveAndFlush(accountTwo);
 
 			ApplicationUser user = repo.saveAndFlush(
 					new ApplicationUser("user",
 							bCryptPasswordEncoder.encode("pass"),
 							Collections.singleton(new Role("user"))));
 			Account accountForUser = new Account(
-					new Amount("RUR", new BigDecimal("123")),
+					new Amount("RUR", new BigDecimal("1000")),
 					"3122 3123 1231 3312",
+					"", user);
+			Account accountForUserTwo = new Account(
+					new Amount("RUR", new BigDecimal("10000")),
+					"3122 3123 1231 1331",
 					"", user);
 
 			accountRepository.saveAndFlush(accountForUser);
+			accountRepository.saveAndFlush(accountForUserTwo);
 		}
 	}
 }

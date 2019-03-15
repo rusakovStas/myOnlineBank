@@ -42,8 +42,9 @@ public class Accounts {
     }
 
     @PostMapping("/transaction")
-    void transaction(@RequestBody Transaction transaction){
-        accountService.transaction(transaction);
+    void transaction(@RequestBody Transaction transaction, Authentication authentication){
+        String name = authentication.getName();
+        accountService.transaction(transaction, name);
     }
 
     @GetMapping("/suggestions")

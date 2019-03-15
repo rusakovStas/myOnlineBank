@@ -29,8 +29,8 @@ class AccountsControllerTest extends CommonApiTest {
     private static final String NOT_ENOUGH_MONEY_ERROR = "On account with number %s amount of money is %s and that not enough for transaction with amount %s";
     private static final String NO_ACCOUNTS_WITH_ID_ERROR = "User '%s' have no account with id %d";
     private static final String DIFFERENT_CURRENCY_ERROR = "Comparison between different currency not implemented yet";
-    private static final String USER_HAVE_NO_ACCOUNT_WITH_ID_ERROR = "User '%s' have no account with id %d";
     private static final String YOU_DON_T_HAS_ACCOUNT_WITH_ID = "You don't has account with id %d";
+    private static final String USER_HASN_T_ROLE_ADMIN_AND_CAN_T_DO_TRANSACTION_FROM_NOT_HIS_ACCOUNTS = "User '%s' hasn't role admin and can't do transaction from not his accounts";
 
     @Test
     void allEndpointsSecured() {
@@ -52,13 +52,8 @@ class AccountsControllerTest extends CommonApiTest {
 
     @Test
     void userHasDefaultAccount() {
-        ResponseEntity<ApplicationUser> userHasDefaultAcc = createUserByAdmin("userHasDefaultAcc");
-        ApplicationUser user = userHasDefaultAcc.getBody();
-        assert user != null;
-        ResponseEntity<List<Account>> userAccountsEntity = authByUser(user.getUsername(), DEFAULT_PASSWORD)
-                .restClientWithoutErrorHandler().exchange("/accounts/my", HttpMethod.GET, null, new ParameterizedTypeReference<List<Account>>() {});
-        List<Account> accounts = userAccountsEntity.getBody();
-        assert accounts != null;
+        ApplicationUser user = createUser("userHasDefaultAcc");
+        List<Account> accounts = getAccountsOfCreatedUser(user.getUsername());
         assertThat(accounts.size(), is(1));
         Account account = accounts.get(0);
 
@@ -75,12 +70,9 @@ class AccountsControllerTest extends CommonApiTest {
     * */
     @Test
     void userCanSeeHisAccounts() {
-        ResponseEntity<List<Account>> userAccountsEntity = authUser()
-                .restClientWithoutErrorHandler().exchange("/accounts/my", HttpMethod.GET, null, new ParameterizedTypeReference<List<Account>>() {});
-        List<Account> accounts = userAccountsEntity.getBody();
-        assert accounts != null;
-        assertThat(accounts.size(), is(1));
-        Account account = accounts.get(0);
+        List<Account> accounts = getAccountsOfDefaultUser();
+        assertThat(accounts.size(), is(2));
+        Account account = accounts.get(1);
 
         assertThat(account.getName(), is(""));
         assertThat(account.getAmount().getCurrency(), is("RUR"));
@@ -177,7 +169,7 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
-    void userCanNotDoTransactionToUserWhichNotExists() {
+    void userCanNotDoTransactionToAccountWhichNotExists() {
         Account accFrom = getAccountsOfDefaultUser().get(0);
         BigDecimal sumFromBefore = accFrom.getAmount().getSum();
 
@@ -267,12 +259,73 @@ class AccountsControllerTest extends CommonApiTest {
                 () -> authUser()
                         .restClientWithErrorHandler()
                         .postForEntity("/accounts/transaction", transaction, String.class));
-        assertThat(runtimeException.getMessage(), containsString(String.format(USER_HAVE_NO_ACCOUNT_WITH_ID_ERROR, userTo.getUsername(), accFrom.getId())));
+        assertThat(runtimeException.getMessage(), containsString(String.format(USER_HASN_T_ROLE_ADMIN_AND_CAN_T_DO_TRANSACTION_FROM_NOT_HIS_ACCOUNTS, anotherUser.getUserName())));
+    }
+
+    @Test
+    void userCantDoTransactionFromNotExistingAccount() {
+        Account accFrom = getAccountsOfDefaultUser().get(0);
+        BigDecimal sumFromBefore = accFrom.getAmount().getSum();
+
+        BigDecimal amountOfTransh = sumFromBefore.add(new BigDecimal("10"));
+
+        Transaction transaction = new Transaction();
+        transaction.setAccountNumberFrom(accFrom.getNumber());
+        transaction.setUserFrom(accFrom.getUser().getUsername());
+        transaction.setAmount(new Amount("RUR", amountOfTransh));
+
+        Long maxId = getSuggestionsToDefaultUser()
+                .stream()
+                .mapToLong(Suggestion::getAccountId)
+                .max()
+                .orElseThrow(() -> new RuntimeException("didn't find a max element"));
+
+        transaction.setAccountIdFrom(maxId+1L);
+        transaction.setAccountIdTo(accFrom.getId());
+        transaction.setUserTo(accFrom.getUser().getUsername());
+
+        RuntimeException runtimeException = assertThrows(RuntimeException.class,
+                () -> authUser()
+                        .restClientWithErrorHandler()
+                        .postForEntity("/accounts/transaction", transaction, String.class));
+        assertThat(runtimeException.getMessage(), containsString(String.format(NO_ACCOUNTS_WITH_ID_ERROR,accFrom.getUser().getUsername() ,maxId+1L)));
     }
 
     @Test
     void adminCanDoTransactionFromAnyAccounts() {
-        throw new NotImplementedYet("Not implemented");
+        ApplicationUser userTo = createUser("userToWhichNotAdmin");
+        Account accFrom = getAccountsOfDefaultUser().get(0);
+        BigDecimal sumFromBefore = accFrom.getAmount().getSum();
+        Account accTo = getAccountsOfCreatedUser(userTo.getUsername()).get(0);
+        BigDecimal sumToBefore = accTo.getAmount().getSum();
+
+        BigDecimal amountOfTransh = new BigDecimal(new BigInteger("10"));
+
+        Transaction transaction = new Transaction();
+        transaction.setAccountIdFrom(accFrom.getId());
+        transaction.setAccountNumberFrom(accFrom.getNumber());
+        transaction.setUserFrom(accFrom.getUser().getUsername());
+        transaction.setAmount(new Amount("RUR", amountOfTransh));
+
+        Suggestion anotherUser = getSuggestionsToDefaultUser()
+                .stream()
+                .filter(s -> s.getUserName().equals(userTo.getUsername()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("no created user for transaction"));
+
+        transaction.setAccountIdTo(anotherUser.getAccountId());
+        transaction.setUserTo(anotherUser.getUserName());
+
+        authAdmin().restClientWithoutErrorHandler().postForEntity("/accounts/transaction", transaction, String.class);
+
+        Account accountDef = getAccountsOfDefaultUser().get(0);
+        BigDecimal sumFromAfter = accountDef.getAmount().getSum();
+
+        Account accountUser = getAccountsOfCreatedUser(userTo.getUsername()).get(0);
+        BigDecimal sumToAfter = accountUser.getAmount().getSum();
+
+        assertThat(sumFromBefore.subtract(amountOfTransh), equalTo(sumFromAfter));
+        assertThat(sumToBefore.add(amountOfTransh), equalTo(sumToAfter));
     }
 
     @Test
@@ -296,7 +349,7 @@ class AccountsControllerTest extends CommonApiTest {
         Account account = accountsOfDefaultUser.get(0);
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
                 () -> authByUser(userForCheckAccountDeleting.getUsername(), DEFAULT_PASSWORD)
-                        .restClientWithErrorHandler().delete("/accounts/delete/"+account.getId()));
+                        .restClientWithErrorHandler().delete("/accounts/delete/" + account.getId()));
         assertThat(runtimeException.getMessage(), containsString(String.format(YOU_DON_T_HAS_ACCOUNT_WITH_ID, account.getId())));
     }
 
@@ -316,7 +369,39 @@ class AccountsControllerTest extends CommonApiTest {
 
     @Test
     void adminHasDefaultAccountWithInfinityAmount() {
-        throw new NotImplementedYet("Not implemented");
+        ApplicationUser userTo = createUser("userForCheckAdminInfinityAccount");
+        Account accFrom = getAccountsOfAdminUser().get(0);
+        BigDecimal sumFromBefore = accFrom.getAmount().getSum();
+        Account accTo = getAccountsOfCreatedUser(userTo.getUsername()).get(0);
+        BigDecimal sumToBefore = accTo.getAmount().getSum();
+
+        BigDecimal amountOfTransh = accFrom.getAmount().getSum().add(new BigDecimal(new BigInteger("10000000")));
+
+        Transaction transaction = new Transaction();
+        transaction.setAccountIdFrom(accFrom.getId());
+        transaction.setAccountNumberFrom(accFrom.getNumber());
+        transaction.setUserFrom(accFrom.getUser().getUsername());
+        transaction.setAmount(new Amount("RUR", amountOfTransh));
+
+        Suggestion anotherUser = getSuggestionsToDefaultUser()
+                .stream()
+                .filter(s -> s.getUserName().equals(userTo.getUsername()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("no created user for transaction"));
+
+        transaction.setAccountIdTo(anotherUser.getAccountId());
+        transaction.setUserTo(anotherUser.getUserName());
+
+        authAdmin().restClientWithoutErrorHandler().postForEntity("/accounts/transaction", transaction, String.class);
+
+        Account accountAdmin = getAccountsOfAdminUser().get(0);
+        BigDecimal sumFromAfter = accountAdmin.getAmount().getSum();
+
+        Account accountUser = getAccountsOfCreatedUser(userTo.getUsername()).get(0);
+        BigDecimal sumToAfter = accountUser.getAmount().getSum();
+
+        assertThat(sumFromBefore, equalTo(sumFromAfter)); //не уменьшилось, хотя сумма даже больше чем есть на счету
+        assertThat(sumToBefore.add(amountOfTransh), equalTo(sumToAfter)); //увеличилось
     }
 
     @Test
@@ -350,6 +435,14 @@ class AccountsControllerTest extends CommonApiTest {
 
     private List<Account> getAccountsOfDefaultUser(){
         ResponseEntity<List<Account>> userAccountsEntity = authUser()
+                .restClientWithoutErrorHandler().exchange("/accounts/my", HttpMethod.GET, null, new ParameterizedTypeReference<List<Account>>() {});
+        List<Account> accounts = userAccountsEntity.getBody();
+        assert accounts!=null;
+        return accounts;
+    }
+
+    private List<Account> getAccountsOfAdminUser(){
+        ResponseEntity<List<Account>> userAccountsEntity = authAdmin()
                 .restClientWithoutErrorHandler().exchange("/accounts/my", HttpMethod.GET, null, new ParameterizedTypeReference<List<Account>>() {});
         List<Account> accounts = userAccountsEntity.getBody();
         assert accounts!=null;

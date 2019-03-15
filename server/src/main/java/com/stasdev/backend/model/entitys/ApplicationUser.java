@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import static javax.persistence.CascadeType.*;
@@ -100,5 +101,23 @@ public class ApplicationUser {
                 ", password='" + password + '\'' +
                 ", roles=" + roles +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ApplicationUser)) return false;
+        ApplicationUser that = (ApplicationUser) o;
+        return Objects.equals(getUser_id(), that.getUser_id()) &&
+                Objects.equals(getUsername(), that.getUsername()) &&
+                Objects.equals(getPassword(), that.getPassword()) &&
+                Objects.equals(getRoles(), that.getRoles()) &&
+                Objects.equals(getAccounts(), that.getAccounts());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getUser_id(), getUsername(), getPassword(), getRoles(), getAccounts());
     }
 }

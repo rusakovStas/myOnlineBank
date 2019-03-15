@@ -1,9 +1,6 @@
 package com.stasdev.backend.model.services.impl;
 
-import com.stasdev.backend.errors.NotEnoughAmountOnAccount;
-import com.stasdev.backend.errors.NotImplementedYet;
-import com.stasdev.backend.errors.ThereIsNoAccountsWithId;
-import com.stasdev.backend.errors.UserNotFound;
+import com.stasdev.backend.errors.*;
 import com.stasdev.backend.model.entitys.*;
 import com.stasdev.backend.model.repos.AccountRepository;
 import com.stasdev.backend.model.repos.ApplicationUserRepository;
@@ -18,7 +15,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -107,16 +103,20 @@ public class AccountServiceImpl implements com.stasdev.backend.model.services.Ac
 
     @Override
     @Transactional
-    public synchronized void transaction(Transaction transaction){
+    public synchronized void transaction(Transaction transaction, String userName){
         transaction.setStartDateTime(LocalDateTime.now());
+        Role admin = roleRepository.findByRole("admin").orElseThrow(() -> new RuntimeException("Not have role admin"));
         try {
-            ApplicationUser userFrom = userRepository.findByUsername(transaction.getUserFrom());
-            if (userFrom == null){
-                throw new UserNotFound(String.format("User with name %s not found",transaction.getUserFrom()));
-            }
-            ApplicationUser userTo = userRepository.findByUsername(transaction.getUserTo());
-            if (userTo == null){
-                throw new UserNotFound(String.format("User with name %s not found",transaction.getUserTo()));
+            ApplicationUser userFrom = userRepository
+                    .getApplicationUserByUsername(transaction.getUserFrom())
+                    .orElseThrow(() -> new UserNotFound(String.format("User with name %s not found",transaction.getUserFrom())));
+            ApplicationUser userTo = userRepository
+                    .getApplicationUserByUsername(transaction.getUserTo())
+                    .orElseThrow(() -> new UserNotFound(String.format("User with name %s not found",transaction.getUserTo())));
+            ApplicationUser authUser = userRepository.findByUsername(userName);
+            boolean authUserIsAdmin = authUser.getRoles().contains(admin);
+            if (!userFrom.equals(authUser) && !authUserIsAdmin){
+                throw new UserCanNotDoThisOperation(String.format("User '%s' hasn't role admin and can't do transaction from not his accounts", userFrom.getUsername()));
             }
             Account accountFrom = accountRepository.findAccountsByUser(userFrom)
                     .orElseThrow(() -> new UserNotFound(String.format("User with name %s not found", userFrom.getUsername())))
@@ -124,6 +124,7 @@ public class AccountServiceImpl implements com.stasdev.backend.model.services.Ac
                     .filter(a -> a.getId().equals(transaction.getAccountIdFrom()))
                     .findAny()
                     .orElseThrow(() -> new ThereIsNoAccountsWithId(String.format(NO_ACCOUNTS_WITH_ID, userFrom.getUsername(), transaction.getAccountIdFrom())));
+            boolean adminHasAccountFrom = authUser.getAccounts().contains(accountFrom);
             Account accountTo = accountRepository.findAccountsByUser(userTo)
                     .orElseThrow(() -> new UserNotFound(String.format("User with name %s not found", userTo.getUsername())))
                     .stream()
@@ -133,14 +134,16 @@ public class AccountServiceImpl implements com.stasdev.backend.model.services.Ac
             Amount amount = transaction.getAmount();
             Amount amountFrom = accountFrom.getAmount();
             Amount amountTo = accountTo.getAmount();
-            if (amountFrom.compareTo(amount) < 0) {
+            if (!authUserIsAdmin && amountFrom.compareTo(amount) < 0) {
                 throw new NotEnoughAmountOnAccount(String.format(ON_ACCOUNT_NOT_ENOUGH_MONEY, accountFrom.getNumber(), accountFrom.getAmount().getSum(), amount.getSum()));
             }
-
-            BigDecimal amountFromSumAfterTransaction = amountFrom.getSum().subtract(amount.getSum());
-            accountFrom
-                    .getAmount()
-                    .setSum(amountFromSumAfterTransaction);
+            //Если админ делает транзакцию со своего счета - значение на ней не уменьшаем
+            if (!(authUserIsAdmin && adminHasAccountFrom)) {
+                BigDecimal amountFromSumAfterTransaction = amountFrom.getSum().subtract(amount.getSum());
+                accountFrom
+                        .getAmount()
+                        .setSum(amountFromSumAfterTransaction);
+            }
 
             BigDecimal amountToSumAfterTransaction = amountTo.getSum().add(amount.getSum());
             accountTo

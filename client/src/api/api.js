@@ -26,11 +26,11 @@ export default {
 			axios.get(`http://${BASE_URL}/users/all`).then(res => res.data),
 		addUser: user =>
 			axios
-				.post(`http://${BASE_URL}/users/create`, user)
+				.post(`http://${BASE_URL}/users`, user)
 				.then(response => response.data),
 		deleteUser: user =>
 			axios
-				.delete(`http://${BASE_URL}/users/delete/${user.username}`)
+				.delete(`http://${BASE_URL}/users/${user.username}`)
 				.then(response => response.data)
 	}
 };

@@ -78,4 +78,13 @@ public class UsersServiceImpl implements UsersService {
         }
         repository.deleteById(byUsername.getUser_id());
     }
+
+    @Override
+    public void deleteUserById(Long id) {
+        ApplicationUser byUsername = repository.findById(id).orElseThrow(() -> new UserNotFound(String.format("User with name '%d' not found!", id)));
+        if (byUsername.getUsername().equals("admin")){
+            throw new AdminDeleteForbidden("You can not delete admin!");
+        }
+        repository.deleteById(byUsername.getUser_id());
+    }
 }

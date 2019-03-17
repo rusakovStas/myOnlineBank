@@ -40,8 +40,11 @@ class AccountsControllerTest extends CommonApiTest {
         ResponseEntity<String> myAccounts = nonAuth().restClientWithoutErrorHandler().getForEntity("/accounts/my", String.class);
         assertThat(myAccounts.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
 
-        ResponseEntity<String> createAccount = nonAuth().restClientWithoutErrorHandler().postForEntity("/accounts/create",null, String.class);
+        ResponseEntity<String> createAccount = nonAuth().restClientWithoutErrorHandler().postForEntity("/accounts",null, String.class);
         assertThat(createAccount.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+
+        ResponseEntity<String> deleteAccount = nonAuth().restClientWithoutErrorHandler().exchange("/accounts/1", HttpMethod.DELETE, null, String.class);
+        assertThat(deleteAccount.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
 
         ResponseEntity<String> transaction = nonAuth().restClientWithoutErrorHandler().postForEntity("/accounts/transaction",null, String.class);
         assertThat(transaction.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
@@ -335,7 +338,7 @@ class AccountsControllerTest extends CommonApiTest {
         int allAccSizeBefore = getAllAccountsByAdmin().size();
         Account account = accountsOfCreatedUser.get(0);
         authByUser(userForCheckAccountDeleting.getUsername(), DEFAULT_PASSWORD)
-                .restClientWithoutErrorHandler().delete("/accounts/delete/"+account.getId());
+                .restClientWithoutErrorHandler().delete("/accounts/"+account.getId());
         int allAccSizeAfter = getAllAccountsByAdmin().size();
         List<Account> accountsAfterDeleting = getAccountsOfCreatedUser(userForCheckAccountDeleting.getUsername());
         assertThat(accountsAfterDeleting.size(), is(0));
@@ -349,7 +352,7 @@ class AccountsControllerTest extends CommonApiTest {
         Account account = accountsOfDefaultUser.get(0);
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
                 () -> authByUser(userForCheckAccountDeleting.getUsername(), DEFAULT_PASSWORD)
-                        .restClientWithErrorHandler().delete("/accounts/delete/" + account.getId()));
+                        .restClientWithErrorHandler().delete("/accounts/" + account.getId()));
         assertThat(runtimeException.getMessage(), containsString(String.format(YOU_DON_T_HAS_ACCOUNT_WITH_ID, account.getId())));
     }
 
@@ -360,7 +363,7 @@ class AccountsControllerTest extends CommonApiTest {
         int allAccSizeBefore = getAllAccountsByAdmin().size();
         Account account = accountsOfCreatedUser.get(0);
         authAdmin()
-                .restClientWithoutErrorHandler().delete("/accounts/delete/" + account.getId());
+                .restClientWithoutErrorHandler().delete("/accounts/" + account.getId());
         int allAccSizeAfter = getAllAccountsByAdmin().size();
         List<Account> accountsAfterDeleting = getAccountsOfCreatedUser(userForCheckAccountDeleting.getUsername());
         assertThat(accountsAfterDeleting.size(), is(0));

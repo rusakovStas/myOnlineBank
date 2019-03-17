@@ -28,10 +28,10 @@ class UsersControllerTest extends CommonApiTest{
         ResponseEntity<String> allUsers = nonAuth().restClientWithoutErrorHandler().getForEntity("/users/all", String.class);
         assertThat(allUsers.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
 
-        ResponseEntity<String> createUser = nonAuth().restClientWithoutErrorHandler().postForEntity("/users/create",null ,String.class);
+        ResponseEntity<String> createUser = nonAuth().restClientWithoutErrorHandler().postForEntity("/users",null ,String.class);
         assertThat(createUser.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
 
-        ResponseEntity<String> deleteUser = nonAuth().restClientWithoutErrorHandler().getForEntity("/users/delete", String.class);
+        ResponseEntity<String> deleteUser = nonAuth().restClientWithoutErrorHandler().exchange("/users/user", HttpMethod.DELETE, null, String.class);
         assertThat(deleteUser.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
     }
 
@@ -79,7 +79,7 @@ class UsersControllerTest extends CommonApiTest{
         checkUserExists(userName);
 
         authAdmin().restClientWithoutErrorHandler()
-                .delete("/users/delete/"+userName);
+                .delete("/users/"+userName);
 
         checkUserNotExists(userName);
     }
@@ -103,7 +103,7 @@ class UsersControllerTest extends CommonApiTest{
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
                 () -> authUser()
                 .restClientWithErrorHandler()
-                .delete("/users/delete/user"));
+                .delete("/users/user"));
         assertThat(runtimeException.getMessage(), containsString("Access is denied"));
     }
 

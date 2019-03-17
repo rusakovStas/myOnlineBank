@@ -141,13 +141,13 @@ abstract class CommonApiTest {
     protected void createUserByUser(String createdUser){
         authUser()
                 .restClientWithErrorHandler()
-                .postForEntity("/users/create", new ApplicationUser(createdUser, DEFAULT_PASSWORD), ApplicationUser.class);
+                .postForEntity("/users", new ApplicationUser(createdUser, DEFAULT_PASSWORD), ApplicationUser.class);
     }
 
     protected ResponseEntity<ApplicationUser> createUserByAdmin(String userName){
         return authAdmin()
                 .restClientWithErrorHandler()
-                .postForEntity("/users/create", new ApplicationUser(userName, DEFAULT_PASSWORD), ApplicationUser.class);
+                .postForEntity("/users", new ApplicationUser(userName, DEFAULT_PASSWORD), ApplicationUser.class);
     }
 
     protected void checkUserExists(String userName){

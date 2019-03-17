@@ -28,15 +28,15 @@ public class Accounts {
         return accountService.getMyAccount(authentication.getName());
     }
 
-    @PostMapping("/create")
+    @PostMapping
     Account createAccount(@RequestBody Account account){
         throw new NotImplementedYet("Operation 'Create' not implemented yet");
     }
 
-    @PostMapping("/name")
-    Account nameAccount(@RequestBody Account account){return null;}
+    @PutMapping
+    Account nameAccount(@RequestBody Account account){throw new NotImplementedYet("Operation 'Create' not implemented yet");}
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     void deleteAccount(Authentication authentication, @PathVariable Long id){
         accountService.deleteAccount(authentication.getName(), id);
     }

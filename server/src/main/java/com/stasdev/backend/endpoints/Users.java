@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+
+import static java.util.Optional.ofNullable;
 
 @RestController
 @RequestMapping("/users")
@@ -27,15 +30,9 @@ public class Users {
         return usersService.createUser(user);
     }
 
-    /*TODO сделать в виде параметров типа ?name=||id=*/
-    @DeleteMapping("/{username}")
-    void deleteUser(@PathVariable String username){
-        usersService.deleteUserByUserName(username);
-    }
-
-    @DeleteMapping("/{id}")
-    void deleteUser(@PathVariable Long id){
-        usersService.deleteUserById(id);
+    @DeleteMapping(params = {"username"})
+    void deleteUser(@RequestParam String username){
+        ofNullable(username).ifPresent(u -> usersService.deleteUserByUserName(u));
     }
 
 }

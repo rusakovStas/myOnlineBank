@@ -30,7 +30,7 @@ export default {
 				.then(response => response.data),
 		deleteUser: user =>
 			axios
-				.delete(`http://${BASE_URL}/users/${user.username}`)
+				.delete(`http://${BASE_URL}/users?username=${user.username}`)
 				.then(response => response.data)
 	}
 };

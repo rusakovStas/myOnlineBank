@@ -15,5 +15,4 @@ public interface UsersService {
 
     void deleteUserByUserName(String userName);
 
-    void deleteUserById(Long id);
 }

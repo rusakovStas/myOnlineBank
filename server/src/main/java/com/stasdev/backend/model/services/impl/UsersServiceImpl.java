@@ -12,14 +12,14 @@ import com.stasdev.backend.model.repos.ApplicationUserRepository;
 import com.stasdev.backend.model.repos.RoleRepository;
 import com.stasdev.backend.model.services.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import static java.util.Optional.ofNullable;
 
 @Service
 public class UsersServiceImpl implements UsersService {
@@ -69,22 +69,17 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public void deleteUserByUserName(String userName) {
-        ApplicationUser byUsername = repository.findByUsername(userName);
-        if (byUsername == null){
-            throw new UserNotFound(String.format("User with name '%s' not found!", userName));
-        }
-        if (byUsername.getUsername().equals("admin")){
+        ApplicationUser byUsername = ofNullable(repository.findByUsername(userName)).orElseThrow(() -> new UserNotFound(String.format("User with name '%s' not found!", userName)));
+        Role admin = roleRepository.findByRole("admin").orElseThrow(() -> new RuntimeException("Not have role admin"));
+        if (byUsername.getRoles().contains(admin)){
             throw new AdminDeleteForbidden("You can not delete admin!");
         }
+        accountRepository
+                .findAccountsByUser(byUsername)
+                .orElse(Collections.emptyList())
+                .forEach(accountRepository::delete);
         repository.deleteById(byUsername.getUser_id());
+        repository.flush();
     }
 
-    @Override
-    public void deleteUserById(Long id) {
-        ApplicationUser byUsername = repository.findById(id).orElseThrow(() -> new UserNotFound(String.format("User with name '%d' not found!", id)));
-        if (byUsername.getUsername().equals("admin")){
-            throw new AdminDeleteForbidden("You can not delete admin!");
-        }
-        repository.deleteById(byUsername.getUser_id());
-    }
 }

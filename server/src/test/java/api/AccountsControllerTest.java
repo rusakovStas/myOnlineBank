@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /*
@@ -43,7 +44,7 @@ class AccountsControllerTest extends CommonApiTest {
         ResponseEntity<String> createAccount = nonAuth().restClientWithoutErrorHandler().postForEntity("/accounts",null, String.class);
         assertThat(createAccount.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
 
-        ResponseEntity<String> deleteAccount = nonAuth().restClientWithoutErrorHandler().exchange("/accounts/1", HttpMethod.DELETE, null, String.class);
+        ResponseEntity<String> deleteAccount = nonAuth().restClientWithoutErrorHandler().exchange("/accounts?id=1", HttpMethod.DELETE, null, String.class);
         assertThat(deleteAccount.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
 
         ResponseEntity<String> transaction = nonAuth().restClientWithoutErrorHandler().postForEntity("/accounts/transaction",null, String.class);
@@ -338,7 +339,7 @@ class AccountsControllerTest extends CommonApiTest {
         int allAccSizeBefore = getAllAccountsByAdmin().size();
         Account account = accountsOfCreatedUser.get(0);
         authByUser(userForCheckAccountDeleting.getUsername(), DEFAULT_PASSWORD)
-                .restClientWithoutErrorHandler().delete("/accounts/"+account.getId());
+                .restClientWithoutErrorHandler().delete("/accounts?id="+account.getId());
         int allAccSizeAfter = getAllAccountsByAdmin().size();
         List<Account> accountsAfterDeleting = getAccountsOfCreatedUser(userForCheckAccountDeleting.getUsername());
         assertThat(accountsAfterDeleting.size(), is(0));
@@ -352,7 +353,7 @@ class AccountsControllerTest extends CommonApiTest {
         Account account = accountsOfDefaultUser.get(0);
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
                 () -> authByUser(userForCheckAccountDeleting.getUsername(), DEFAULT_PASSWORD)
-                        .restClientWithErrorHandler().delete("/accounts/" + account.getId()));
+                        .restClientWithErrorHandler().delete("/accounts?id=" + account.getId()));
         assertThat(runtimeException.getMessage(), containsString(String.format(YOU_DON_T_HAS_ACCOUNT_WITH_ID, account.getId())));
     }
 
@@ -363,7 +364,7 @@ class AccountsControllerTest extends CommonApiTest {
         int allAccSizeBefore = getAllAccountsByAdmin().size();
         Account account = accountsOfCreatedUser.get(0);
         authAdmin()
-                .restClientWithoutErrorHandler().delete("/accounts/" + account.getId());
+                .restClientWithoutErrorHandler().delete("/accounts?id=" + account.getId());
         int allAccSizeAfter = getAllAccountsByAdmin().size();
         List<Account> accountsAfterDeleting = getAccountsOfCreatedUser(userForCheckAccountDeleting.getUsername());
         assertThat(accountsAfterDeleting.size(), is(0));
@@ -435,6 +436,25 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
 
+    @Test
+    void whenDeletedUserAllHisAccountsDeletedToo() {
+        ApplicationUser checkDeletingAccounts = createUser("CheckDeletingAccounts");
+        List<Account> accountsOfCreatedUser = getAccountsOfCreatedUser(checkDeletingAccounts.getUsername());
+        assertThat("No default account for new user", accountsOfCreatedUser.size(), equalTo(1));
+        /*TODO добавить еще один счет для чистоты эксперимента после добавления этой функции*/
+        authAdmin().restClientWithErrorHandler()
+                .delete("/users?username="+checkDeletingAccounts.getUsername());
+
+        checkUserNotExists(checkDeletingAccounts.getUsername());
+
+        List<Account> allAccountsByAdmin = getAllAccountsByAdmin();
+        int sizeAccountsDeletedUsers = allAccountsByAdmin
+                .stream()
+                .filter(accountsOfCreatedUser::contains)
+                .collect(Collectors.toList())
+                .size();
+        assertThat(sizeAccountsDeletedUsers, equalTo(0));
+    }
 
     private List<Account> getAccountsOfDefaultUser(){
         ResponseEntity<List<Account>> userAccountsEntity = authUser()

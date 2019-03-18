@@ -36,8 +36,8 @@ public class Accounts {
     @PutMapping
     Account nameAccount(@RequestBody Account account){throw new NotImplementedYet("Operation 'Create' not implemented yet");}
 
-    @DeleteMapping("/{id}")
-    void deleteAccount(Authentication authentication, @PathVariable Long id){
+    @DeleteMapping(params = {"id"})
+    void deleteAccount(Authentication authentication, @RequestParam Long id){
         accountService.deleteAccount(authentication.getName(), id);
     }
 

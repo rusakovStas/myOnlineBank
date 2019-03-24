@@ -1,4 +1,4 @@
-package integration;
+package common;
 
 import java.io.IOException;
 import java.util.Properties;

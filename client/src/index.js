@@ -2,6 +2,7 @@ import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 import { BrowserRouter, Route } from "react-router-dom";
 import thunk from "redux-thunk";
+import jwtDecode from "jwt-decode";
 import { composeWithDevTools } from "redux-devtools-extension";
 import axios from "axios";
 import React from "react";
@@ -22,6 +23,7 @@ const store = createStore(
 
 if (localStorage.tokenJWT && localStorage.roles) {
 	const user = {
+		name: jwtDecode(localStorage.tokenJWT).user_name,
 		access_token: localStorage.tokenJWT,
 		roles: JSON.parse(localStorage.roles)
 	};

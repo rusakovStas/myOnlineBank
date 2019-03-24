@@ -1,18 +1,34 @@
 package api;
 
-import com.stasdev.backend.errors.NotImplementedYet;
 import com.stasdev.backend.model.entitys.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompFrameHandler;
+import org.springframework.messaging.simp.stomp.StompHeaders;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
+import org.springframework.web.socket.sockjs.client.SockJsClient;
+import org.springframework.web.socket.sockjs.client.Transport;
+import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
@@ -24,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 * Проверяем защищенность всех ендпоинтов
 * и тестируем все операции
 * TODO придумать удаление юзера после теста - возможно нужно организовать "отмену команды"
+* TODO думаю следует вынести все сообщения об ошибках в специальный отдельный класс который можно будет юзать и в тестах
+*
 * */
 class AccountsControllerTest extends CommonApiTest {
 
@@ -32,6 +50,11 @@ class AccountsControllerTest extends CommonApiTest {
     private static final String DIFFERENT_CURRENCY_ERROR = "Comparison between different currency not implemented yet";
     private static final String YOU_DON_T_HAS_ACCOUNT_WITH_ID = "You don't has account with id %d";
     private static final String USER_HASN_T_ROLE_ADMIN_AND_CAN_T_DO_TRANSACTION_FROM_NOT_HIS_ACCOUNTS = "User '%s' hasn't role admin and can't do transaction from not his accounts";
+    private static final String TOPIC_PUSH = "/topic/push/";
+    private static final String TOPIC_ACCOUNTS = "/topic/accounts/";
+
+    private String socketURL = "http://localhost:" + port + "/online-bank";
+
 
     @Test
     void allEndpointsSecured() {
@@ -102,7 +125,11 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
-    void userCanDoTransaction() {
+    void userCanDoTransaction() throws InterruptedException, ExecutionException, TimeoutException {
+
+        StompSession stompSession = getStompClient()
+                .connect(socketURL, new StompSessionHandlerAdapter() {}).get(1, SECONDS);
+
         ApplicationUser userTo = createUser("userTo");
         Account accFrom = getAccountsOfDefaultUser().get(0);
         BigDecimal sumFromBefore = accFrom.getAmount().getSum();
@@ -126,6 +153,16 @@ class AccountsControllerTest extends CommonApiTest {
         transaction.setAccountIdTo(anotherUser.getAccountId());
         transaction.setUserTo(anotherUser.getUserName());
 
+        StompHandler<Account> accountStompHandlerFrom = new StompHandler<>(1, () -> Account.class);
+        StompHandler<Account> accountStompHandlerTo = new StompHandler<>(1, () -> Account.class);
+        StompHandler<Push> pushStompHandlerFrom = new StompHandler<>(1, () -> Push.class);
+        StompHandler<Push> pushStompHandlerTo = new StompHandler<>(1, () -> Push.class);
+
+        stompSession.subscribe(TOPIC_PUSH + transaction.getUserFrom(), pushStompHandlerFrom);
+        stompSession.subscribe(TOPIC_PUSH + transaction.getUserTo(), pushStompHandlerTo);
+        stompSession.subscribe(TOPIC_ACCOUNTS + transaction.getUserFrom(), accountStompHandlerFrom);
+        stompSession.subscribe(TOPIC_ACCOUNTS + transaction.getUserTo(), accountStompHandlerTo);
+
         authUser().restClientWithoutErrorHandler().postForEntity("/accounts/transaction", transaction, String.class);
 
         Account accountDef = getAccountsOfDefaultUser().get(0);
@@ -136,6 +173,32 @@ class AccountsControllerTest extends CommonApiTest {
 
         assertThat(sumFromBefore.subtract(amountOfTransh), equalTo(sumFromAfter));
         assertThat(sumToBefore.add(amountOfTransh), equalTo(sumToAfter));
+
+        Account accountUpdatedFrom = accountStompHandlerFrom
+                .getMessage(0)
+                .get(3, SECONDS);
+        Account accountUpdatedTo = accountStompHandlerTo
+                .getMessage(0)
+                .get(3, SECONDS);
+        Push pushFromCheck = pushStompHandlerFrom
+                .getMessage(0)
+                .get(3, SECONDS);
+        Push pushToCheck = pushStompHandlerTo
+                .getMessage(0)
+                .get(3, SECONDS);
+        assertThat(accountDef, is(equalTo(accountUpdatedFrom)));
+        assertThat(accountUser, is(equalTo(accountUpdatedTo)));
+
+        assertThat(accountUpdatedFrom.getName(), is(accountDef.getName()));
+        assertThat(accountUpdatedFrom.getNumber(), isEmptyOrNullString());
+        assertThat(accountUpdatedFrom.getUser(), is(nullValue()));
+
+        assertThat(accountUpdatedTo.getName(), is(accountUser.getName()));
+        assertThat(accountUpdatedTo.getNumber(), isEmptyOrNullString());
+        assertThat(accountUpdatedTo.getUser(), is(nullValue()));
+
+        assertThat(pushFromCheck.getMsg(), equalTo("Your transaction was successful"));
+        assertThat(pushToCheck.getMsg(), equalTo(String.format("User '%s' sent money for you", transaction.getUserFrom())));
     }
 
     @Test
@@ -296,7 +359,11 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
-    void adminCanDoTransactionFromAnyAccounts() {
+    void adminCanDoTransactionFromAnyAccounts() throws InterruptedException, ExecutionException, TimeoutException {
+
+        StompSession stompSession = getStompClient()
+                .connect(socketURL, new StompSessionHandlerAdapter() {}).get(1, SECONDS);
+
         ApplicationUser userTo = createUser("userToWhichNotAdmin");
         Account accFrom = getAccountsOfDefaultUser().get(0);
         BigDecimal sumFromBefore = accFrom.getAmount().getSum();
@@ -320,6 +387,23 @@ class AccountsControllerTest extends CommonApiTest {
         transaction.setAccountIdTo(anotherUser.getAccountId());
         transaction.setUserTo(anotherUser.getUserName());
 
+        StompHandler<Account> accountStompHandlerFrom = new StompHandler<>(1, () -> Account.class);
+        StompHandler<Account> accountStompHandlerTo = new StompHandler<>(1, () -> Account.class);
+        StompHandler<Account> accountStompHandlerAdmin = new StompHandler<>(2, () -> Account.class);
+        StompHandler<Push> pushStompHandlerAdmin = new StompHandler<>(1, () -> Push.class);
+        StompHandler<Push> pushStompHandlerFrom = new StompHandler<>(1, () -> Push.class);
+        StompHandler<Push> pushStompHandlerTo = new StompHandler<>(1, () -> Push.class);
+
+        stompSession.subscribe(TOPIC_PUSH + transaction.getUserFrom(), pushStompHandlerFrom);
+        stompSession.subscribe(TOPIC_PUSH + transaction.getUserTo(), pushStompHandlerTo);
+        stompSession.subscribe(TOPIC_ACCOUNTS + transaction.getUserFrom(), accountStompHandlerFrom);
+        stompSession.subscribe(TOPIC_ACCOUNTS + transaction.getUserTo(), accountStompHandlerTo);
+
+        String adminName = "admin";
+        stompSession.subscribe(TOPIC_ACCOUNTS + adminName, accountStompHandlerAdmin);
+        stompSession.subscribe(TOPIC_PUSH + adminName, pushStompHandlerAdmin);
+
+
         authAdmin().restClientWithoutErrorHandler().postForEntity("/accounts/transaction", transaction, String.class);
 
         Account accountDef = getAccountsOfDefaultUser().get(0);
@@ -330,6 +414,169 @@ class AccountsControllerTest extends CommonApiTest {
 
         assertThat(sumFromBefore.subtract(amountOfTransh), equalTo(sumFromAfter));
         assertThat(sumToBefore.add(amountOfTransh), equalTo(sumToAfter));
+
+        Account accountUpdatedFrom = accountStompHandlerFrom
+                .getMessage(0)
+                .get(3, SECONDS);
+        Account accountUpdatedTo = accountStompHandlerTo
+                .getMessage(0)
+                .get(3, SECONDS);
+
+        Account accountUpdatedFromForAdmin = accountStompHandlerAdmin
+                .getMessage(0)
+                .get(3, SECONDS);
+        Account accountUpdatedToForAdmin = accountStompHandlerAdmin
+                .getMessage(1)
+                .get(3, SECONDS);
+        Push pushAdminCheck = pushStompHandlerAdmin
+                .getMessage(0)
+                .get(3, SECONDS);
+
+        Push pushFromCheck = pushStompHandlerFrom
+                .getMessage(0)
+                .get(3, SECONDS);
+        Push pushToCheck = pushStompHandlerTo
+                .getMessage(0)
+                .get(3, SECONDS);
+
+        assertThat(accountDef, is(equalTo(accountUpdatedFrom)));
+        assertThat(accountUser, is(equalTo(accountUpdatedTo)));
+
+        assertThat(accountUpdatedFromForAdmin, not(equalTo(accountUpdatedToForAdmin))); // Проверяем что пришло два разных счета
+//      Проверяем что это те счета которые участвовали в транзакции
+        assertThat(accountDef, isOneOf(accountUpdatedFromForAdmin, accountUpdatedToForAdmin));
+        assertThat(accountUser, isOneOf(accountUpdatedToForAdmin, accountUpdatedFromForAdmin));
+
+        assertThat(accountUpdatedFrom.getName(), is(accountDef.getName()));
+        assertThat(accountUpdatedFrom.getNumber(), isEmptyOrNullString());
+        assertThat(accountUpdatedFrom.getUser(), is(nullValue()));
+
+//      Проверяем что вся чувствительная информация была убрана из сообщений от сокета
+        assertThat(accountUpdatedTo.getName(), is(accountUser.getName()));
+        assertThat(accountUpdatedTo.getNumber(), isEmptyOrNullString());
+        assertThat(accountUpdatedTo.getUser(), is(nullValue()));
+
+        assertThat(accountUpdatedFromForAdmin.getName(), isOneOf(accountDef.getName(),accountUser.getName()));
+        assertThat(accountUpdatedFromForAdmin.getNumber(), isEmptyOrNullString());
+        assertThat(accountUpdatedFromForAdmin.getUser(), is(nullValue()));
+
+        assertThat(accountUpdatedToForAdmin.getName(), isOneOf(accountUser.getName(), accountDef.getName()));
+        assertThat(accountUpdatedToForAdmin.getNumber(), isEmptyOrNullString());
+        assertThat(accountUpdatedToForAdmin.getUser(), is(nullValue()));
+
+        assertThat(pushAdminCheck.getMsg(), equalTo("Your transaction was successful"));
+        assertThat(pushFromCheck.getMsg(), equalTo("Your transaction was successful"));
+        assertThat(pushToCheck.getMsg(), equalTo(String.format("User '%s' sent money for you", transaction.getUserFrom())));
+    }
+
+    @Test
+    void adminCanDoTransactionFromHisOwnAccounts() throws InterruptedException, ExecutionException, TimeoutException {
+        StompSession stompSession = getStompClient()
+                .connect(socketURL, new StompSessionHandlerAdapter() {}).get(1, SECONDS);
+
+        ApplicationUser userTo = createUser("userToWhichNotAdminAgain");
+        Account accFrom = getAccountsOfAdminUser().get(0); // Транзакцию выполняем со счета админа
+        BigDecimal sumFromBefore = accFrom.getAmount().getSum();
+        Account accTo = getAccountsOfCreatedUser(userTo.getUsername()).get(0);
+        BigDecimal sumToBefore = accTo.getAmount().getSum();
+
+        BigDecimal amountOfTransh = new BigDecimal(new BigInteger("10"));
+
+        Transaction transaction = new Transaction();
+        transaction.setAccountIdFrom(accFrom.getId());
+        transaction.setAccountNumberFrom(accFrom.getNumber());
+        transaction.setUserFrom(accFrom.getUser().getUsername());
+        transaction.setAmount(new Amount("RUR", amountOfTransh));
+
+        Suggestion anotherUser = getSuggestionsToDefaultUser()
+                .stream()
+                .filter(s -> s.getUserName().equals(userTo.getUsername()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("no created user for transaction"));
+
+        transaction.setAccountIdTo(anotherUser.getAccountId());
+        transaction.setUserTo(anotherUser.getUserName());
+
+        StompHandler<Account> accountStompHandlerFrom = new StompHandler<>(1, () -> Account.class);
+        StompHandler<Account> accountStompHandlerTo = new StompHandler<>(1, () -> Account.class);
+        StompHandler<Account> accountStompHandlerAdmin = new StompHandler<>(2, () -> Account.class);
+        StompHandler<Push> pushStompHandlerAdmin = new StompHandler<>(1, () -> Push.class);
+        StompHandler<Push> pushStompHandlerFrom = new StompHandler<>(1, () -> Push.class);
+        StompHandler<Push> pushStompHandlerTo = new StompHandler<>(1, () -> Push.class);
+
+        stompSession.subscribe(TOPIC_PUSH + transaction.getUserFrom(), pushStompHandlerFrom);
+        stompSession.subscribe(TOPIC_PUSH + transaction.getUserTo(), pushStompHandlerTo);
+        stompSession.subscribe(TOPIC_ACCOUNTS + transaction.getUserFrom(), accountStompHandlerFrom);
+        stompSession.subscribe(TOPIC_ACCOUNTS + transaction.getUserTo(), accountStompHandlerTo);
+
+        String adminName = "admin";
+        stompSession.subscribe(TOPIC_ACCOUNTS + adminName, accountStompHandlerAdmin);
+        stompSession.subscribe(TOPIC_PUSH + adminName, pushStompHandlerAdmin);
+
+
+        authAdmin().restClientWithoutErrorHandler().postForEntity("/accounts/transaction", transaction, String.class);
+
+        Account accountDef = getAccountsOfAdminUser().get(0);
+        BigDecimal sumFromAfter = accountDef.getAmount().getSum();
+
+        Account accountUser = getAccountsOfCreatedUser(userTo.getUsername()).get(0);
+        BigDecimal sumToAfter = accountUser.getAmount().getSum();
+
+        assertThat(sumFromBefore, equalTo(sumFromAfter)); // Не уменьшается так как счет админа
+        assertThat(sumToBefore.add(amountOfTransh), equalTo(sumToAfter));
+
+        Account accountUpdatedFrom = accountStompHandlerFrom
+                .getMessage(0)
+                .get(3, SECONDS);
+        Account accountUpdatedTo = accountStompHandlerTo
+                .getMessage(0)
+                .get(3, SECONDS);
+
+        Account accountUpdatedFromForAdmin = accountStompHandlerAdmin
+                .getMessage(0)
+                .get(3, SECONDS);
+        Account accountUpdatedToForAdmin = accountStompHandlerAdmin
+                .getMessage(1)
+                .get(3, SECONDS);
+        Push pushAdminCheck = pushStompHandlerAdmin
+                .getMessage(0)
+                .get(3, SECONDS);
+
+        Push pushFromCheck = pushStompHandlerFrom
+                .getMessage(0)
+                .get(3, SECONDS);
+        Push pushToCheck = pushStompHandlerTo
+                .getMessage(0)
+                .get(3, SECONDS);
+
+        assertThat(accountDef, is(equalTo(accountUpdatedFrom)));
+        assertThat(accountUser, is(equalTo(accountUpdatedTo)));
+
+        assertThat(accountUpdatedFromForAdmin, not(equalTo(accountUpdatedToForAdmin))); // Проверяем что пришло два разных счета
+//      Проверяем что это те счета которые участвовали в транзакции
+        assertThat(accountDef, isOneOf(accountUpdatedFromForAdmin, accountUpdatedToForAdmin));
+        assertThat(accountUser, isOneOf(accountUpdatedToForAdmin, accountUpdatedFromForAdmin));
+
+        assertThat(accountUpdatedFrom.getName(), is(accountDef.getName()));
+        assertThat(accountUpdatedFrom.getNumber(), isEmptyOrNullString());
+        assertThat(accountUpdatedFrom.getUser(), is(nullValue()));
+
+//      Проверяем что вся чувствительная информация была убрана из сообщений от сокета
+        assertThat(accountUpdatedTo.getName(), is(accountUser.getName()));
+        assertThat(accountUpdatedTo.getNumber(), isEmptyOrNullString());
+        assertThat(accountUpdatedTo.getUser(), is(nullValue()));
+
+        assertThat(accountUpdatedFromForAdmin.getName(), isOneOf(accountDef.getName(),accountUser.getName()));
+        assertThat(accountUpdatedFromForAdmin.getNumber(), isEmptyOrNullString());
+        assertThat(accountUpdatedFromForAdmin.getUser(), is(nullValue()));
+
+        assertThat(accountUpdatedToForAdmin.getName(), isOneOf(accountUser.getName(), accountDef.getName()));
+        assertThat(accountUpdatedToForAdmin.getNumber(), isEmptyOrNullString());
+        assertThat(accountUpdatedToForAdmin.getUser(), is(nullValue()));
+
+        assertThat(pushAdminCheck.getMsg(), equalTo("Your transaction was successful"));
+        assertThat(pushFromCheck.getMsg(), equalTo("Your transaction was successful"));
+        assertThat(pushToCheck.getMsg(), equalTo(String.format("User '%s' sent money for you", transaction.getUserFrom())));
     }
 
     @Test
@@ -454,6 +701,50 @@ class AccountsControllerTest extends CommonApiTest {
                 .collect(Collectors.toList())
                 .size();
         assertThat(sizeAccountsDeletedUsers, equalTo(0));
+    }
+
+
+    private WebSocketStompClient getStompClient() {
+        WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(createTransportClient()));
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());//Если этого не будет он будет МОЛЧА падать при попытке кастануть payload к нужному типу
+        return stompClient;
+    }
+
+
+    private class StompHandler<T> implements StompFrameHandler {
+
+        private List<CompletableFuture<T>> completableFutureList;
+        private Supplier<Type> typeSupplier;
+
+        StompHandler(int expectedMessageSize, Supplier<Type> typeSupplier) {
+            this.typeSupplier = typeSupplier;
+            this.completableFutureList = new ArrayList<>(expectedMessageSize);
+            for (int i = 0; i < expectedMessageSize; i++) {
+                this.completableFutureList.add(new CompletableFuture<>());
+            }
+        }
+
+        public CompletableFuture<T> getMessage(int i){
+            return this.completableFutureList.get(i);
+        }
+
+        @Override
+        public Type getPayloadType(StompHeaders headers) {
+            return typeSupplier.get();
+        }
+
+        @Override
+        public synchronized void handleFrame(StompHeaders headers, Object payload) {
+            this.completableFutureList.stream()
+                    .filter(c -> !c.isDone())
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Unexpected message "+ (T) payload))
+                    .complete((T) payload);
+        }
+    }
+
+    private List<Transport> createTransportClient() {
+        return Collections.singletonList(new WebSocketTransport(new StandardWebSocketClient()));
     }
 
     private List<Account> getAccountsOfDefaultUser(){

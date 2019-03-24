@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Container, Row, Col, Jumbotron } from "reactstrap";
 import Account from "./Account";
 
@@ -80,7 +81,7 @@ class AccountForm extends React.Component {
 							md={{ size: 10, offset: 1 }}
 							className="mb-2 mt-2"
 						/>
-						{this.state.accounts.map(acc => (
+						{this.props.accounts.map(acc => (
 							<Col
 								sm="12"
 								md={{ size: 10, offset: 1 }}
@@ -88,9 +89,11 @@ class AccountForm extends React.Component {
 							>
 								<Account
 									account={acc}
-									open={this.state.collapse === acc.index}
+									open={this.state.collapse === acc.id}
 									toggle={this.toggle}
-									suggestions={this.state.suggestions}
+									suggestions={this.props.suggestions}
+									transaction={this.props.transaction}
+									decline={this.props.decline}
 								/>
 							</Col>
 						))}
@@ -100,5 +103,13 @@ class AccountForm extends React.Component {
 		);
 	}
 }
+
+AccountForm.propTypes = {
+	transaction: PropTypes.func.isRequired,
+	decline: PropTypes.func.isRequired,
+	edite: PropTypes.func.isRequired,
+	accounts: PropTypes.arrayOf.isRequired,
+	suggestions: PropTypes.arrayOf.isRequired
+};
 
 export default AccountForm;

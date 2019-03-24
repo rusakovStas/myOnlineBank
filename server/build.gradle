@@ -37,6 +37,7 @@ dependencies {
 	compile('org.postgresql:postgresql')
 	compile("org.springframework.boot:spring-boot-starter-actuator")
 	compile("com.h2database:h2")
+	compile("org.springframework.boot:spring-boot-starter-websocket")
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 

@@ -19,6 +19,8 @@ public class Transaction {
     private Long accountIdTo;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
+    private Amount amount;
+    private String userTo;
 
     public LocalDateTime getEndDateTime() {
         return endDateTime;
@@ -52,8 +54,7 @@ public class Transaction {
         this.accountNumberTo = accountNumberTo;
     }
 
-    private Amount amount;
-    private String userTo;
+
 
     public Transaction() {
     }

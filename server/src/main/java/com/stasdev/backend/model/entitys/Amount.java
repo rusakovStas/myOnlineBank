@@ -6,6 +6,7 @@ import com.stasdev.backend.errors.NotImplementedYet;
 import javax.persistence.Embeddable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Objects;
 
 @Embeddable
 public class Amount implements Comparable<Amount>{
@@ -44,4 +45,5 @@ public class Amount implements Comparable<Amount>{
         }
         return this.sum.compareTo(o.sum);
     }
+
 }

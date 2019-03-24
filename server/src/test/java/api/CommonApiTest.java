@@ -4,13 +4,17 @@ import com.stasdev.backend.BackendApplication;
 import com.stasdev.backend.model.entitys.ApplicationUser;
 import com.stasdev.backend.model.entitys.Role;
 import com.stasdev.backend.model.repos.ApplicationUserRepository;
+import common.TestProperties;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
@@ -41,11 +45,14 @@ import static org.hamcrest.Matchers.not;
 * Запускает приложение с тестовым профайлом и настройками (рандомный порт, база H2 создается с нуля)
 * Предоставляет доступ к рест темплейту и основным методам его настройки (за счет этого можно не переживать за то что настройки прошлого теста повлияют на следующие)
 * */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = BackendApplication.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = BackendApplication.class)
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.properties")// переопределяем проперти для запуска
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)//Это необходимо что бы BeforeAll выполнялся после старта спринга (потому что будет выполняться только при создание инстанса тестового класса)
 abstract class CommonApiTest {
+
+
+    protected int port = TestProperties.getInstance().getAppPort();
 
     protected static final String DEFAULT_PASSWORD = "Password";
     @Autowired

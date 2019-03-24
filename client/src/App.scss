@@ -113,19 +113,19 @@ section {
 }
 
 .account-item {
-  background: linear-gradient(to bottom right, $gray-800, $gray-900) !important;
+  /*background: linear-gradient(to bottom right, $gray-800, $gray-900) !important;*/
   /*Cover with cat*/
 
   /*background: url(./components/Account/cat.jpg);*/
 
   /*Dark simple cover with gradient*/
 
-  /*  background: linear-gradient(
+  background: linear-gradient(
       45deg,
       rgba(103, 0, 31, 0.8),
       rgba(34, 101, 163, 0.5)
     ),
-    url(./components/Account/cover.jpg);*/
+    url(./components/Account/cover.jpg);
 
   /*Cover with flowers*/
 

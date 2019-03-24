@@ -14,13 +14,15 @@ export default function user(state = [], action) {
 		case UPDATE_ACCOUNT:
 			return state.map(item =>
 				item.id === action.account.id
-					? { ...item, amount: action.account.amount }
+					? {
+							...item,
+							amount: action.account.amount,
+							name: action.account.name
+					  }
 					: item
 			);
 		case DELETE_ACCOUNT:
-			return state.filter(
-				item => item.account !== action.account.account
-			);
+			return state.filter(item => item.account.id !== action.id);
 		default:
 			return state;
 	}

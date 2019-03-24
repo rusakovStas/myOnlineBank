@@ -1,6 +1,7 @@
 package com.stasdev.backend.model.entitys;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Account {
@@ -60,5 +61,23 @@ public class Account {
 
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Account)) return false;
+        Account account = (Account) o;
+        return Objects.equals(getId(), account.getId());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getId());
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

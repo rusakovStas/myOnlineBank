@@ -22,7 +22,8 @@ class Account extends React.Component {
 		edite: false,
 		block: false,
 		loading: false,
-		chosen: []
+		chosen: [],
+		transactionData: {}
 	};
 
 	constructor(props) {
@@ -103,17 +104,50 @@ class Account extends React.Component {
 			});
 		}
 		if (this.state.transaction) {
-			this.setState({
-				confirm: false,
-				transaction: false,
-				openTransaction: false
-			});
+			this.setState({ loading: true });
+			this.props
+				.transaction(this.state.transactionData)
+				.then(() => this.setState({ loading: false }))
+				.then(() =>
+					this.setState({
+						confirm: false,
+						transaction: false,
+						openTransaction: false
+					})
+				);
 		}
 	};
 
 	handleOptionSelected = option => {
-		this.setState({ chosen: option });
+		if (option.length >= 1) {
+			this.setState({
+				transactionData: {
+					...this.state.transactionData,
+					userTo:
+						option[0].userName === "My own account"
+							? this.props.account.user.username
+							: option[0].userName,
+					accountNumberTo: option[0].maskAccountNumber,
+					accountIdTo: option[0].accountId,
+					userFrom: this.props.account.user.username,
+					accountNumberFrom: this.props.account.number,
+					accountIdFrom: this.props.account.id
+				},
+				chosen: option
+			});
+		}
 	};
+
+	onChangeAmount = e =>
+		this.setState({
+			transactionData: {
+				...this.state.transactionData,
+				amount: {
+					sum: e.target.value,
+					currency: this.props.account.amount.currency
+				}
+			}
+		});
 
 	render() {
 		const { account, open, toggle, suggestions } = this.props;
@@ -123,7 +157,8 @@ class Account extends React.Component {
 			edite,
 			block,
 			loading,
-			chosen
+			chosen,
+			transaction
 		} = this.state;
 		return (
 			<div>
@@ -139,11 +174,11 @@ class Account extends React.Component {
 							/>
 						</CardTitle>
 					)}
-					<CardText onClick={() => toggle(account.index)}>
+					<CardText onClick={() => toggle(account.id)}>
 						<large>
 							<p>
 								<b className="text-monospace">
-									Amount: {account.amount}
+									Amount: {account.amount.sum}
 									<FontAwesomeIcon
 										icon="ruble-sign"
 										size="1x"
@@ -160,7 +195,7 @@ class Account extends React.Component {
 
 						<p className="card-text text-right pl-1 mt-0">
 							<small className="text-muted">
-								Owner: {account.owner}
+								Owner: {account.user.username}
 							</small>
 						</p>
 					</CardText>
@@ -175,7 +210,8 @@ class Account extends React.Component {
 											{option.userName}
 											<div>
 												<small>
-													Account: {option.account}
+													Account:
+													{option.maskAccountNumber}
 												</small>
 											</div>
 										</div>
@@ -183,7 +219,9 @@ class Account extends React.Component {
 									labelKey={option =>
 										`${
 											option.userName
-										} with account end on ${option.account}`
+										} with account end on ${
+											option.maskAccountNumber
+										}`
 									}
 									options={suggestions}
 									placeholder="Type user name..."
@@ -191,7 +229,18 @@ class Account extends React.Component {
 									onChange={this.handleOptionSelected}
 									selected={chosen}
 								/>
-								<Input placeholder="Type amount..." />
+								<Input
+									placeholder="Type amount..."
+									type="number"
+									validate
+									error="wrong"
+									success="right"
+									id="amount"
+									name="amount"
+									value={transaction.amount}
+									onChange={this.onChangeAmount}
+									disabled={loading}
+								/>
 							</CardText>
 						</Collapse>
 						<Collapse isOpen={block}>
@@ -282,14 +331,20 @@ Account.propTypes = {
 	decline: PropTypes.func.isRequired,
 	edite: PropTypes.func.isRequired,
 	account: PropTypes.shape({
-		index: PropTypes.number.isRequired,
+		id: PropTypes.number.isRequired,
 		name: PropTypes.string,
-		number: PropTypes.string.isRequired
+		number: PropTypes.string.isRequired,
+		user: PropTypes.shape({
+			username: PropTypes.string.isRequired
+		}).isRequired,
+		amount: PropTypes.shape({
+			sum: PropTypes.string.isRequired,
+			currency: PropTypes.string.isRequired
+		}).isRequired
 	}).isRequired,
 	suggestions: PropTypes.shape({
 		userName: PropTypes.string.isRequired,
-		account: PropTypes.string.isRequired,
-		index: PropTypes.number.isRequired
+		account: PropTypes.string.isRequired
 	}).isRequired,
 	open: PropTypes.bool.isRequired,
 	toggle: PropTypes.func.isRequired

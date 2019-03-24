@@ -26,13 +26,15 @@ public class AccountServiceImpl implements com.stasdev.backend.model.services.Ac
     private final TransactionRepository transactionRepository;
     private final ApplicationUserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final SocketServiceImpl socketService;
 
     @Autowired
-    public AccountServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository, ApplicationUserRepository userRepository, RoleRepository roleRepository) {
+    public AccountServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository, ApplicationUserRepository userRepository, RoleRepository roleRepository, SocketServiceImpl socketService) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.socketService = socketService;
     }
 
     @Override
@@ -103,7 +105,7 @@ public class AccountServiceImpl implements com.stasdev.backend.model.services.Ac
 
     @Override
     @Transactional
-    public synchronized void transaction(Transaction transaction, String userName){
+    public synchronized void transaction(Transaction transaction,final String userName){
         transaction.setStartDateTime(LocalDateTime.now());
         Role admin = roleRepository.findByRole("admin").orElseThrow(() -> new RuntimeException("Not have role admin"));
         try {
@@ -150,8 +152,8 @@ public class AccountServiceImpl implements com.stasdev.backend.model.services.Ac
                     .getAmount()
                     .setSum(amountToSumAfterTransaction);
 
-            accountRepository.saveAndFlush(accountFrom);
-            accountRepository.saveAndFlush(accountTo);
+            socketService.sendPushAboutTransaction(transaction, userName);
+            socketService.sendPushWithUpdatedAccounts(accountRepository.saveAndFlush(accountFrom), accountRepository.saveAndFlush(accountTo));
         }finally {
             transaction.setEndDateTime(LocalDateTime.now());
             transactionRepository.save(transaction);

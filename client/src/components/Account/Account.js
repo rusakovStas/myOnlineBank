@@ -12,6 +12,7 @@ import {
 } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Typeahead } from "react-bootstrap-typeahead";
+import { toastr } from "react-redux-toastr";
 import FormButton from "../commons/FormButton";
 
 class Account extends React.Component {
@@ -162,7 +163,7 @@ class Account extends React.Component {
 		} = this.state;
 		return (
 			<div>
-				<Card className="text-center text-white account-item shadow p-2">
+				<Card className="text-center account-item shadow p-2">
 					{(!!account.name || edite) && (
 						<CardTitle>
 							<input
@@ -170,7 +171,7 @@ class Account extends React.Component {
 								disabled={this.state.edite === false}
 								ref={this.inputForName}
 								onFocus={this.handleFocus}
-								className="border-0 form-input form-control input-in-header text-white"
+								className="border-0 form-input form-control input-in-header "
 							/>
 						</CardTitle>
 					)}
@@ -317,7 +318,13 @@ class Account extends React.Component {
 					</Collapse>
 				</Card>
 				<div className="fixed-bottom d-flex justify-content-center p-3">
-					<Button size="lg" color="primary">
+					<Button
+						size="lg"
+						color="primary"
+						onClick={() =>
+							toastr.success("The title", "The message")
+						}
+					>
 						Add new account
 					</Button>
 				</div>

@@ -6,6 +6,7 @@ import com.stasdev.backend.model.repos.AccountRepository;
 import com.stasdev.backend.model.repos.ApplicationUserRepository;
 import com.stasdev.backend.model.repos.RoleRepository;
 import com.stasdev.backend.model.repos.TransactionRepository;
+import com.stasdev.backend.model.services.AccountService;
 import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class AccountServiceImpl implements com.stasdev.backend.model.services.AccountService {
+public class AccountServiceImpl implements AccountService {
 
     private static final String NO_ACCOUNTS_WITH_ID = "User '%s' have no account with id %d";
     private static final String ON_ACCOUNT_NOT_ENOUGH_MONEY = "On account with number %s amount of money is %s and that not enough for transaction with amount %s";

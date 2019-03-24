@@ -3706,7 +3706,7 @@ etag@~1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
-eventemitter3@^3.0.0:
+eventemitter3@^3.0.0, eventemitter3@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.0.tgz#090b4d6cdbd645ed10bf750d4b5407942d7ba163"
   integrity sha512-ivIvhpq/Y0uSjcHDcOIccjmYjGLcP09MFGE7ysAwkAvkXfpZlC985pH2/ui64DKazbTW/4kN3yqozUxlXzI6cA==
@@ -8575,6 +8575,14 @@ react-popper@^1.0.0:
     prop-types "^15.6.1"
     typed-styles "^0.0.7"
     warning "^4.0.2"
+
+react-redux-toastr@^7.4.8:
+  version "7.4.8"
+  resolved "https://registry.yarnpkg.com/react-redux-toastr/-/react-redux-toastr-7.4.8.tgz#e1ae5bb9504b2851d9fbbdaf6e6a2184f2643eb5"
+  integrity sha512-Z3TlOCMuNdBQgDlEfBYXq2SkecBv84eeWbCwwLchE+X6vKMS5FjJHgEf3g35rS5UCSSa/4v0ocoHoaj0Isw21A==
+  dependencies:
+    classnames "^2.2.3"
+    eventemitter3 "^3.1.0"
 
 react-redux@^5.0.7:
   version "5.1.1"

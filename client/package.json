@@ -17,6 +17,7 @@
     "react-bootstrap-typeahead": "^3.3.4",
     "react-dom": "^16.7.0",
     "react-redux": "^5.0.7",
+    "react-redux-toastr": "^7.4.8",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.3",

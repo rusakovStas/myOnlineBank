@@ -11,6 +11,7 @@ import AdminRoute from "./components/commons/AdminRoute";
 import UserRoute from "./components/commons/UserRoute";
 import TopNavigationBar from "./components/commons/TopNavigationBar";
 import AccountPage from "./components/Account/Page";
+import ReduxToastr from "react-redux-toastr";
 
 library.add(faArrowDown, faRubleSign);
 
@@ -26,6 +27,16 @@ const App = ({ location, isAuthentifacated }) => (
     />
     <AdminRoute location={location} path="/admin" exact component={UserPage} />
     <GuestRoute location={location} path="/" exact component={LoginPage} />
+    {isAuthentifacated && (
+      <ReduxToastr
+        timeOut={4000}
+        newestOnTop={false}
+        position="top-right"
+        transitionIn="fadeIn"
+        transitionOut="fadeOut"
+        closeOnToastrClick
+      />
+    )}
   </div>
 );
 

@@ -541,7 +541,6 @@ class AccountsControllerTest extends CommonApiTest {
         Push pushAdminCheck = pushStompHandlerAdmin
                 .getMessage(0)
                 .get(3, SECONDS);
-
         Push pushFromCheck = pushStompHandlerFrom
                 .getMessage(0)
                 .get(3, SECONDS);

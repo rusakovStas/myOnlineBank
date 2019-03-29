@@ -34,9 +34,9 @@ public class SocketServiceImpl {
 
     public void sendPushAboutTransaction(Transaction transaction, String userName){
         if (!userName.equals(transaction.getUserFrom())){
-            simpMessagingTemplate.convertAndSend("/topic/push/"+userName, new Push("Your transaction was successful"));
+            simpMessagingTemplate.convertAndSend("/topic/push/" + userName, new Push("Your transaction was successful"));
         }
-        simpMessagingTemplate.convertAndSend("/topic/push/"+transaction.getUserFrom(), new Push("Your transaction was successful"));
+        simpMessagingTemplate.convertAndSend("/topic/push/" + transaction.getUserFrom(), new Push("Your transaction was successful"));
         simpMessagingTemplate.convertAndSend("/topic/push/"+transaction.getUserTo(),  new Push("User '"+transaction.getUserFrom()+"' sent money for you"));
     }
 

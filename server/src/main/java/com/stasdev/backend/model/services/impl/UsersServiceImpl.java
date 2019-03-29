@@ -10,10 +10,9 @@ import com.stasdev.backend.model.entitys.Role;
 import com.stasdev.backend.model.repos.AccountRepository;
 import com.stasdev.backend.model.repos.ApplicationUserRepository;
 import com.stasdev.backend.model.repos.RoleRepository;
+import com.stasdev.backend.model.services.Preparer;
 import com.stasdev.backend.model.services.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,16 +23,17 @@ import static java.util.Optional.ofNullable;
 @Service
 public class UsersServiceImpl implements UsersService {
 
-    private static final String INITIAL_AMOUNT_SUM = "1000";
-    private final ApplicationUserRepository repository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final RoleRepository roleRepository;
     private final AccountRepository accountRepository;
+    private final ApplicationUserRepository repository;
+    private final Preparer preparer;
+    private static final String INITIAL_AMOUNT_SUM = "1000";
+
 
     @Autowired
-    public UsersServiceImpl(ApplicationUserRepository repository, BCryptPasswordEncoder bCryptPasswordEncoder, RoleRepository roleRepository, AccountRepository accountRepository) {
+    public UsersServiceImpl(ApplicationUserRepository repository, RoleRepository roleRepository, AccountRepository accountRepository, Preparer preparer) {
         this.repository = repository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.preparer = preparer;
         this.roleRepository = roleRepository;
         this.accountRepository = accountRepository;
     }
@@ -44,18 +44,15 @@ public class UsersServiceImpl implements UsersService {
             throw new UserIsAlreadyExist(String.format("User with name '%s' already exists!", user.getUsername()));
         }
         Role userRole = roleRepository.findByRole("user").orElse(new Role("user"));
-        ApplicationUser newUser = repository.saveAndFlush(
-                new ApplicationUser(user.getUsername(),
-                        bCryptPasswordEncoder.encode(user.getPassword()),
-                        Collections.singleton(userRole)));
+        ApplicationUser newUser = repository.saveAndFlush(preparer.prepareToSave(user, userRole));
         Account account = new Account(
                 new Amount("RUR", new BigDecimal(INITIAL_AMOUNT_SUM)),
-                "3122 3123 1231 3131", /*TODO сделать генерацию*/
                 "Default",
                  newUser);
-        accountRepository.saveAndFlush(account);
+        accountRepository.saveAndFlush(preparer.prepareToSave(account));
         return repository.findByUsername(newUser.getUsername());
     }
+
 
     @Override
     public Set<Role> getUserRole(String username){
@@ -76,7 +73,6 @@ public class UsersServiceImpl implements UsersService {
         }
         accountRepository
                 .findAccountsByUser(byUsername)
-                .orElse(Collections.emptyList())
                 .forEach(accountRepository::delete);
         repository.deleteById(byUsername.getUser_id());
         repository.flush();

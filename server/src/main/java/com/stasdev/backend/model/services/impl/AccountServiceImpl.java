@@ -46,8 +46,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<Account> getMyAccount(String name){
         return accountRepository
-                .findAccountsByUser(userRepository.findByUsername(name))
-                .orElse(Collections.emptyList());
+                .findAccountsByUser(userRepository.findByUsername(name));
     }
 
     @Override
@@ -110,30 +109,22 @@ public class AccountServiceImpl implements AccountService {
         transaction.setStartDateTime(LocalDateTime.now());
         Role admin = roleRepository.findByRole("admin").orElseThrow(() -> new RuntimeException("Not have role admin"));
         try {
-            ApplicationUser userFrom = userRepository
-                    .getApplicationUserByUsername(transaction.getUserFrom())
-                    .orElseThrow(() -> new UserNotFound(String.format("User with name %s not found",transaction.getUserFrom())));
-            ApplicationUser userTo = userRepository
-                    .getApplicationUserByUsername(transaction.getUserTo())
-                    .orElseThrow(() -> new UserNotFound(String.format("User with name %s not found",transaction.getUserTo())));
+
+            ApplicationUser userFrom = getApplicationUserWithCheck(transaction.getUserFrom());
+            ApplicationUser userTo = getApplicationUserWithCheck(transaction.getUserTo());
             ApplicationUser authUser = userRepository.findByUsername(userName);
+
             boolean authUserIsAdmin = authUser.getRoles().contains(admin);
+
             if (!userFrom.equals(authUser) && !authUserIsAdmin){
                 throw new UserCanNotDoThisOperation(String.format("User '%s' hasn't role admin and can't do transaction from not his accounts", userFrom.getUsername()));
             }
-            Account accountFrom = accountRepository.findAccountsByUser(userFrom)
-                    .orElseThrow(() -> new UserNotFound(String.format("User with name %s not found", userFrom.getUsername())))
-                    .stream()
-                    .filter(a -> a.getId().equals(transaction.getAccountIdFrom()))
-                    .findAny()
-                    .orElseThrow(() -> new ThereIsNoAccountsWithId(String.format(NO_ACCOUNTS_WITH_ID, userFrom.getUsername(), transaction.getAccountIdFrom())));
+
+            Account accountFrom = getAccountFromUser(userFrom, transaction.getAccountIdFrom());
+            Account accountTo = getAccountFromUser(userTo, transaction.getAccountIdTo());
+
             boolean adminHasAccountFrom = authUser.getAccounts().contains(accountFrom);
-            Account accountTo = accountRepository.findAccountsByUser(userTo)
-                    .orElseThrow(() -> new UserNotFound(String.format("User with name %s not found", userTo.getUsername())))
-                    .stream()
-                    .filter(a -> a.getId().equals(transaction.getAccountIdTo()))
-                    .findAny()
-                    .orElseThrow(() -> new ThereIsNoAccountsWithId(String.format(NO_ACCOUNTS_WITH_ID, userTo.getUsername(), transaction.getAccountIdTo())));
+
             Amount amount = transaction.getAmount();
             Amount amountFrom = accountFrom.getAmount();
             Amount amountTo = accountTo.getAmount();
@@ -160,6 +151,20 @@ public class AccountServiceImpl implements AccountService {
             transactionRepository.save(transaction);
         }
 
+    }
+
+     public ApplicationUser getApplicationUserWithCheck(String user) {
+        return userRepository
+                .getApplicationUserByUsername(user)
+                .orElseThrow(() -> new UserNotFound(String.format("User with name %s not found", user)));
+    }
+
+    public Account getAccountFromUser(ApplicationUser userTo, Long accountIdTo) {
+        return accountRepository.findAccountsByUser(userTo)
+                .stream()
+                .filter(a -> a.getId().equals(accountIdTo))
+                .findAny()
+                .orElseThrow(() -> new ThereIsNoAccountsWithId(String.format(NO_ACCOUNTS_WITH_ID, userTo.getUsername(), accountIdTo)));
     }
 
 }

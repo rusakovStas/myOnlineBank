@@ -163,7 +163,7 @@ class Account extends React.Component {
 		} = this.state;
 		return (
 			<div>
-				<Card className="text-center account-item shadow p-2">
+				<Card className="text-center account-item shadow p-2 text-white">
 					{(!!account.name || edite) && (
 						<CardTitle>
 							<input
@@ -171,7 +171,7 @@ class Account extends React.Component {
 								disabled={this.state.edite === false}
 								ref={this.inputForName}
 								onFocus={this.handleFocus}
-								className="border-0 form-input form-control input-in-header "
+								className="border-0 form-input form-control input-in-header text-white"
 							/>
 						</CardTitle>
 					)}

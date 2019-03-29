@@ -6,6 +6,7 @@ import com.stasdev.backend.model.entitys.ApplicationUser;
 import com.stasdev.backend.model.entitys.Role;
 import com.stasdev.backend.model.repos.AccountRepository;
 import com.stasdev.backend.model.repos.ApplicationUserRepository;
+import com.stasdev.backend.model.services.Preparer;
 import com.stasdev.backend.model.services.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -41,6 +42,8 @@ public class BackendApplication {
 		AccountRepository accountRepository;
 		@Autowired
 		BCryptPasswordEncoder bCryptPasswordEncoder;
+		@Autowired
+		Preparer preparer;
 
 		@Override
 		public void run(String... args) throws Exception {
@@ -52,9 +55,8 @@ public class BackendApplication {
 			);
 			Account account = new Account(
 					new Amount("RUR", new BigDecimal("123")),
-					"3122 3123 1231 3131",
 					"Admin account", admin);
-			accountRepository.saveAndFlush(account);
+			accountRepository.saveAndFlush(preparer.prepareToSave(account));
 		}
 	}
 
@@ -72,6 +74,8 @@ public class BackendApplication {
 		AccountRepository accountRepository;
 		@Autowired
 		BCryptPasswordEncoder bCryptPasswordEncoder;
+		@Autowired
+		Preparer preparer;
 
 		@Override
 		public void run(String... args) throws Exception {
@@ -81,9 +85,8 @@ public class BackendApplication {
 							bCryptPasswordEncoder.encode("pass"), Collections.singleton(new Role("admin"))));
 			Account account = new Account(
 					new Amount("RUR", new BigDecimal("100000")),
-					"3122 3123 1231 3131",
 					"God account", admin);
-			accountRepository.saveAndFlush(account);
+			accountRepository.saveAndFlush(preparer.prepareToSave(account));
 
 			ApplicationUser user = repo.saveAndFlush(
 					new ApplicationUser("user",
@@ -91,15 +94,13 @@ public class BackendApplication {
 							Collections.singleton(new Role("user"))));
 			Account accountForUser = new Account(
 					new Amount("RUR", new BigDecimal("1000")),
-					"3122 3123 1231 3312",
 					"", user);
 			Account accountForUserTwo = new Account(
 					new Amount("RUR", new BigDecimal("10000")),
-					"3122 3123 1231 1331",
 					"", user);
 
-			accountRepository.saveAndFlush(accountForUser);
-			accountRepository.saveAndFlush(accountForUserTwo);
+			accountRepository.saveAndFlush(preparer.prepareToSave(accountForUser));
+			accountRepository.saveAndFlush(preparer.prepareToSave(accountForUserTwo));
 		}
 	}
 
@@ -117,6 +118,8 @@ public class BackendApplication {
 		AccountRepository accountRepository;
 		@Autowired
 		BCryptPasswordEncoder bCryptPasswordEncoder;
+		@Autowired
+		Preparer preparer;
 
 		@Override
 		public void run(String... args) throws Exception {
@@ -126,9 +129,8 @@ public class BackendApplication {
 							bCryptPasswordEncoder.encode("pass"), Collections.singleton(new Role("admin"))));
 			Account account = new Account(
 					new Amount("RUR", new BigDecimal("100000")),
-					"3122 3123 1231 3131",
 					"God account", admin);
-			accountRepository.saveAndFlush(account);
+			accountRepository.saveAndFlush(preparer.prepareToSave(account));
 
 			ApplicationUser user = repo.saveAndFlush(
 					new ApplicationUser("user",
@@ -136,15 +138,13 @@ public class BackendApplication {
 							Collections.singleton(new Role("user"))));
 			Account accountForUser = new Account(
 					new Amount("RUR", new BigDecimal("1000")),
-					"3122 3123 1231 3312",
 					"", user);
 			Account accountForUserTwo = new Account(
 					new Amount("RUR", new BigDecimal("10000")),
-					"3122 3123 1231 1331",
 					"", user);
 
-			accountRepository.saveAndFlush(accountForUser);
-			accountRepository.saveAndFlush(accountForUserTwo);
+			accountRepository.saveAndFlush(preparer.prepareToSave(accountForUser));
+			accountRepository.saveAndFlush(preparer.prepareToSave(accountForUserTwo));
 		}
 	}
 }

@@ -4,6 +4,7 @@ import {
 	UPDATE_ACCOUNT,
 	DELETE_ACCOUNT
 } from "./types";
+import { toastr } from "react-redux-toastr";
 import api from "../api/api";
 import webSocket from "../api/web-socket";
 
@@ -34,6 +35,9 @@ export const getAllAccounts = username => dispatch => {
 	webSocket.stompClient.onEvent(`/topic/accounts/${username}`, response => {
 		dispatch(updateAccount(response));
 	});
+	webSocket.stompClient.onEvent(`/topic/push/${username}`, response => {
+		toastr.success("Message from server", response.msg);
+	});
 };
 
 export const getMyAccounts = username => dispatch => {
@@ -42,6 +46,9 @@ export const getMyAccounts = username => dispatch => {
 	});
 	webSocket.stompClient.onEvent(`/topic/accounts/${username}`, response => {
 		dispatch(updateAccount(response));
+	});
+	webSocket.stompClient.onEvent(`/topic/push/${username}`, response => {
+		toastr.success("Message from server", response.msg);
 	});
 };
 

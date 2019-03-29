@@ -4,6 +4,15 @@ task testApi(type: Test) {
     testLogging.showStandardStreams = true
     include 'api/**/*'
     exclude 'integration/**/*'
+    exclude 'com/stasdev/backend/**/*'
+}
+
+task testUnit(type: Test) {
+    useJUnitPlatform()
+    testLogging.showStandardStreams = true
+    include 'com/stasdev/backend/**/*'
+    exclude 'api/**/*'
+    exclude 'integration/**/*'
 }
 
 task integrationTest(type: Test) {
@@ -11,6 +20,7 @@ task integrationTest(type: Test) {
     testLogging.showStandardStreams = true
     include 'integration/**/*'
     exclude 'api/**/*'
+    exclude 'com/stasdev/backend/**/*'
     systemProperty "selenide.baseUrl", System.getProperty("selenide.baseUrl")
     systemProperty "selenide.browser", System.getProperty("selenide.browser")
 }

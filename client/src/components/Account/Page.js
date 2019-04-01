@@ -32,6 +32,7 @@ class AccountPage extends React.Component {
 				suggestions={this.state.suggestions}
 				transaction={api.account.createTransaction}
 				decline={this.props.deleteAccount}
+				currentUser={this.props.currentUser}
 			/>
 		);
 	}

@@ -1,64 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Container, Row, Col, Jumbotron } from "reactstrap";
+import { Container, Row, Col, Button } from "reactstrap";
+import { toastr } from "react-redux-toastr";
 import Account from "./Account";
 
 class AccountForm extends React.Component {
 	state = {
-		accounts: [
-			{
-				number: "4876 1323 2343 1231",
-				owner: "user",
-				amount: "1000",
-				index: 0
-			},
-			{
-				number: "4876 1323 2343 1231",
-				owner: "user",
-				name: "Common",
-				amount: "1000",
-				index: 1
-			},
-			{
-				number: "4876 1323 2343 1231",
-				owner: "user",
-				name: "Love account",
-				amount: "1000",
-				index: 2
-			}
-		],
-		suggestions: [
-			{
-				userName: "Alabama",
-				account: 4780127,
-				index: 1
-			},
-			{
-				userName: "Alaska",
-				account: 710249,
-				index: 2
-			},
-			{
-				userName: "Arizona",
-				account: "63***92307",
-				index: 3
-			},
-			{
-				userName: "Arkansas",
-				account: 2915958,
-				index: 4
-			},
-			{
-				userName: "California",
-				account: 37254503,
-				index: 5
-			},
-			{
-				userName: "California",
-				account: 37254504,
-				index: 6
-			}
-		],
 		collapse: -1
 	};
 
@@ -71,10 +18,7 @@ class AccountForm extends React.Component {
 	render() {
 		return (
 			<div>
-				<Container>
-					<Jumbotron className="d-flex justify-content-center p-0">
-						<h1 className="display-4">Accounts</h1>
-					</Jumbotron>
+				 <Container>
 					<Row>
 						<Col
 							sm="12"
@@ -85,9 +29,10 @@ class AccountForm extends React.Component {
 							<Col
 								sm="12"
 								md={{ size: 10, offset: 1 }}
-								className="mb-1"
+								className="mb-3"
 							>
 								<Account
+									currentUser={this.props.currentUser}
 									account={acc}
 									open={this.state.collapse === acc.id}
 									toggle={this.toggle}
@@ -98,6 +43,17 @@ class AccountForm extends React.Component {
 							</Col>
 						))}
 					</Row>
+					<div className="fixed-bottom d-flex justify-content-center p-3">
+						<Button
+							size="lg"
+							color="primary"
+							onClick={() =>
+								toastr.success("The title", "The message")
+							}
+						>
+							Add new account
+						</Button>
+					</div>
 				</Container>
 			</div>
 		);
@@ -109,7 +65,8 @@ AccountForm.propTypes = {
 	decline: PropTypes.func.isRequired,
 	edite: PropTypes.func.isRequired,
 	accounts: PropTypes.arrayOf.isRequired,
-	suggestions: PropTypes.arrayOf.isRequired
+	suggestions: PropTypes.arrayOf.isRequired,
+	currentUser: PropTypes.string.isRequired
 };
 
 export default AccountForm;

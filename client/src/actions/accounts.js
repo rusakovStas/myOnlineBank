@@ -1,10 +1,10 @@
+import { toastr } from "react-redux-toastr";
 import {
 	GET_ACCOUNTS,
 	ADD_ACCOUNT,
 	UPDATE_ACCOUNT,
 	DELETE_ACCOUNT
 } from "./types";
-import { toastr } from "react-redux-toastr";
 import api from "../api/api";
 import webSocket from "../api/web-socket";
 
@@ -23,9 +23,9 @@ export const updateAccount = account => ({
 	account
 });
 
-export const del = account => ({
+export const del = id => ({
 	type: DELETE_ACCOUNT,
-	account
+	id
 });
 
 export const getAllAccounts = username => dispatch => {
@@ -53,6 +53,6 @@ export const getMyAccounts = username => dispatch => {
 };
 
 export const deleteAccount = accountId => dispatch =>
-	api.admin.deleteUser(accountId).then(() => {
+	api.account.deleteAccount(accountId).then(() => {
 		dispatch(del(accountId));
 	});

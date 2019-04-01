@@ -66,13 +66,12 @@ $jumbotron-bg: $gray-100 !default;
 $navbar-brand-padding-y: 10px;
 
 $card-border-width: 0px !default;
-$card-border-radius: 5px !default;
+$card-border-radius: 20px !default;
 $alert-border-radius: 0px !default;
 
 .shadow {
-  background: #fc0; /* Цвет фона */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Параметры тени */
-  /*padding: 10px;*/
+  background: #e8e8e8; /* Цвет фона */
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)
 }
 
 .grow-or-fall {
@@ -113,7 +112,11 @@ section {
 }
 
 .account-item {
-  background: linear-gradient(to bottom right, $gray-800, $gray-900) !important;
+background: linear-gradient(to right, #5B86E5, #36D1DC);
+
+
+
+  /*background: linear-gradient(to bottom right, $gray-800, $gray-900) !important;*/
   /*Cover with cat*/
 
   /*background: url(./components/Account/cat.jpg);*/
@@ -159,6 +162,7 @@ section {
 /* Делаем отступ снизу что бы зафиксированная кнопка влезала */
 body {
   padding-bottom: 5rem;
+
 }
 
 @import "bootstrap/scss/bootstrap.scss";

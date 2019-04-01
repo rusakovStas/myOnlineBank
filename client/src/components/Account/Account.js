@@ -12,7 +12,6 @@ import {
 } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Typeahead } from "react-bootstrap-typeahead";
-import { toastr } from "react-redux-toastr";
 import FormButton from "../commons/FormButton";
 
 class Account extends React.Component {
@@ -93,6 +92,10 @@ class Account extends React.Component {
 
 	accept = () => {
 		if (this.state.block) {
+			this.setState({ loading: true });
+			this.props
+				.decline(this.props.account.id)
+				.then(() => this.setState({ loading: false }));
 			this.setState({
 				confirm: false,
 				block: false
@@ -151,7 +154,7 @@ class Account extends React.Component {
 		});
 
 	render() {
-		const { account, open, toggle, suggestions } = this.props;
+		const { account, open, toggle, suggestions, currentUser } = this.props;
 		const {
 			openTransaction,
 			confirm,
@@ -163,7 +166,7 @@ class Account extends React.Component {
 		} = this.state;
 		return (
 			<div>
-				<Card className="text-center account-item shadow p-2 text-white">
+				<Card className="text-center account-item p-2 text-white grow-on-hover shadow">
 					{(!!account.name || edite) && (
 						<CardTitle>
 							<input
@@ -179,7 +182,7 @@ class Account extends React.Component {
 						<large>
 							<p>
 								<b className="text-monospace">
-									Amount: {account.amount.sum}
+									 {account.amount.sum}
 									<FontAwesomeIcon
 										icon="ruble-sign"
 										size="1x"
@@ -219,9 +222,9 @@ class Account extends React.Component {
 									)}
 									labelKey={option =>
 										`${
-											option.userName
-										} with account end on ${
 											option.maskAccountNumber
+										} ${
+											option.userName
 										}`
 									}
 									options={suggestions}
@@ -260,6 +263,7 @@ class Account extends React.Component {
 											block
 											color="danger"
 											className="mb-2"
+											disabled={account.user.username !== currentUser}
 											onClick={this.toggleBlock}
 										>
 											Block
@@ -317,23 +321,13 @@ class Account extends React.Component {
 						</div>
 					</Collapse>
 				</Card>
-				<div className="fixed-bottom d-flex justify-content-center p-3">
-					<Button
-						size="lg"
-						color="primary"
-						onClick={() =>
-							toastr.success("The title", "The message")
-						}
-					>
-						Add new account
-					</Button>
-				</div>
 			</div>
 		);
 	}
 }
 
 Account.propTypes = {
+	currentUser: PropTypes.string.isRequired,
 	transaction: PropTypes.func.isRequired,
 	decline: PropTypes.func.isRequired,
 	edite: PropTypes.func.isRequired,

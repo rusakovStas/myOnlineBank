@@ -81,24 +81,17 @@ public class AccountServiceImpl implements AccountService {
     public Account nameAccount(Account account){
         return null;
     }
-
+    
     @Override
     @Transactional
     public void deleteAccount(String userName, Long id){
-        Role admin = roleRepository.findByRole("admin").orElseThrow(() -> new RuntimeException("Not have role admin"));
         Account one = accountRepository.getOne(id);
         ApplicationUser byUsername = userRepository.findByUsername(userName);
-        if (!byUsername.getRoles().contains(admin) && !one.getUser().getUsername().equals(userName)){
+        if (!one.getUser().getUsername().equals(userName)){
             throw new ThereIsNoAccountsWithId(String.format("You don't has account with id %d", id));
         }
-        if (byUsername.getRoles().contains(admin)){
-            ApplicationUser userAcc = userRepository.findByUsername(one.getUser().getUsername());
-            userAcc.getAccounts().remove(one);
-            userRepository.saveAndFlush(userAcc);
-        }else {
-            byUsername.getAccounts().remove(one);
-            userRepository.saveAndFlush(byUsername);
-        }
+        byUsername.getAccounts().remove(one);
+        userRepository.saveAndFlush(byUsername);
         accountRepository.deleteById(id);
         accountRepository.flush();
     }
@@ -112,27 +105,27 @@ public class AccountServiceImpl implements AccountService {
 
             ApplicationUser userFrom = getApplicationUserWithCheck(transaction.getUserFrom());
             ApplicationUser userTo = getApplicationUserWithCheck(transaction.getUserTo());
-            ApplicationUser authUser = userRepository.findByUsername(userName);
+            ApplicationUser currentUser = userRepository.findByUsername(userName);
 
-            boolean authUserIsAdmin = authUser.getRoles().contains(admin);
+            boolean currentUserHasRoleAdmin = currentUser.getRoles().contains(admin);
 
-            if (!userFrom.equals(authUser) && !authUserIsAdmin){
+            if (!userFrom.equals(currentUser) && !currentUserHasRoleAdmin){
                 throw new UserCanNotDoThisOperation(String.format("User '%s' hasn't role admin and can't do transaction from not his accounts", userFrom.getUsername()));
             }
 
             Account accountFrom = getAccountFromUser(userFrom, transaction.getAccountIdFrom());
             Account accountTo = getAccountFromUser(userTo, transaction.getAccountIdTo());
 
-            boolean adminHasAccountFrom = authUser.getAccounts().contains(accountFrom);
+            boolean accountFromBelongsToCurrentUser = currentUser.getAccounts().contains(accountFrom);
 
             Amount amount = transaction.getAmount();
             Amount amountFrom = accountFrom.getAmount();
             Amount amountTo = accountTo.getAmount();
-            if (!authUserIsAdmin && amountFrom.compareTo(amount) < 0) {
+            if (!currentUserHasRoleAdmin && amountFrom.compareTo(amount) < 0) {
                 throw new NotEnoughAmountOnAccount(String.format(ON_ACCOUNT_NOT_ENOUGH_MONEY, accountFrom.getNumber(), accountFrom.getAmount().getSum(), amount.getSum()));
             }
             //Если админ делает транзакцию со своего счета - значение на ней не уменьшаем
-            if (!(authUserIsAdmin && adminHasAccountFrom)) {
+            if (!(currentUserHasRoleAdmin && accountFromBelongsToCurrentUser)) {
                 BigDecimal amountFromSumAfterTransaction = amountFrom.getSum().subtract(amount.getSum());
                 accountFrom
                         .getAmount()
@@ -153,13 +146,13 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
-     public ApplicationUser getApplicationUserWithCheck(String user) {
+    ApplicationUser getApplicationUserWithCheck(String user) {
         return userRepository
                 .getApplicationUserByUsername(user)
                 .orElseThrow(() -> new UserNotFound(String.format("User with name %s not found", user)));
     }
 
-    public Account getAccountFromUser(ApplicationUser userTo, Long accountIdTo) {
+    Account getAccountFromUser(ApplicationUser userTo, Long accountIdTo) {
         return accountRepository.findAccountsByUser(userTo)
                 .stream()
                 .filter(a -> a.getId().equals(accountIdTo))

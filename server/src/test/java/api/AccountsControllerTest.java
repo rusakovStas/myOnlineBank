@@ -597,24 +597,27 @@ class AccountsControllerTest extends CommonApiTest {
         ApplicationUser userForCheckAccountDeleting = createUser("UserForCheckForbiddenDeletingAccAnotherUser");
         List<Account> accountsOfDefaultUser = getAccountsOfDefaultUser();
         Account account = accountsOfDefaultUser.get(0);
+        int allAccSizeBefore = getAllAccountsByAdmin().size();
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
                 () -> authByUser(userForCheckAccountDeleting.getUsername(), DEFAULT_PASSWORD)
                         .restClientWithErrorHandler().delete("/accounts?id=" + account.getId()));
         assertThat(runtimeException.getMessage(), containsString(String.format(YOU_DON_T_HAS_ACCOUNT_WITH_ID, account.getId())));
+        int allAccSizeAfter = getAllAccountsByAdmin().size();
+        assertThat(allAccSizeBefore, is(allAccSizeAfter));
     }
 
     @Test
-    void adminCanDeleteAnyAccount() {
+    void adminCanNotDeleteAnyAccount() {
         ApplicationUser userForCheckAccountDeleting = createUser("UserForCheckAccountDeletingByAdmin");
         List<Account> accountsOfCreatedUser = getAccountsOfCreatedUser(userForCheckAccountDeleting.getUsername());
         int allAccSizeBefore = getAllAccountsByAdmin().size();
         Account account = accountsOfCreatedUser.get(0);
-        authAdmin()
-                .restClientWithoutErrorHandler().delete("/accounts?id=" + account.getId());
+        RuntimeException runtimeException = assertThrows(RuntimeException.class,
+                () -> authAdmin()
+                        .restClientWithErrorHandler().delete("/accounts?id=" + account.getId()));
+        assertThat(runtimeException.getMessage(), containsString(String.format(YOU_DON_T_HAS_ACCOUNT_WITH_ID, account.getId())));
         int allAccSizeAfter = getAllAccountsByAdmin().size();
-        List<Account> accountsAfterDeleting = getAccountsOfCreatedUser(userForCheckAccountDeleting.getUsername());
-        assertThat(accountsAfterDeleting.size(), is(0));
-        assertThat(allAccSizeAfter, is(allAccSizeBefore - 1));
+        assertThat(allAccSizeBefore, is(allAccSizeAfter));
     }
 
     @Test

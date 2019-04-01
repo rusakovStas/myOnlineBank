@@ -22,7 +22,7 @@ export default function user(state = [], action) {
 					: item
 			);
 		case DELETE_ACCOUNT:
-			return state.filter(item => item.account.id !== action.id);
+			return state.filter(item => item.id !== action.id);
 		default:
 			return state;
 	}

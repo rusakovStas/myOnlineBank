@@ -19,10 +19,15 @@ export const userRoles = roles => ({
 
 export const login = cred => dispatch =>
 	api.user.login(cred).then(user => {
-		localStorage.tokenJWT = user.access_token;
-		setAuthToken(user.access_token);
-		dispatch(userLoggedIn(user));
-		dispatch(userRoles(jwtDecode(user.access_token).authorities));
+		const extendedUser = {
+			name: jwtDecode(user.access_token).user_name,
+			access_token: user.access_token,
+			roles: user.roles
+		};
+		localStorage.tokenJWT = extendedUser.access_token;
+		setAuthToken(extendedUser.access_token);
+		dispatch(userLoggedIn(extendedUser));
+		dispatch(userRoles(jwtDecode(extendedUser.access_token).authorities));
 	});
 
 export const logout = () => dispatch => {

@@ -1,14 +1,19 @@
 package com.stasdev.backend.model.entitys;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+
+import static javax.persistence.CascadeType.*;
 
 @Entity
 public class ApplicationUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long user_id;
     private String username;
     private String password;
@@ -20,6 +25,25 @@ public class ApplicationUser {
             inverseJoinColumns = { @JoinColumn(name = "role_id") }
     )
     private Set<Role> roles = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Account> accounts;
+
+    public Set<Account> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(Set<Account> accounts) {
+        this.accounts = accounts;
+    }
+
+    public ApplicationUser(String username, String password, Set<Role> roles, Set<Account> accounts) {
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+        this.accounts = accounts;
+    }
 
     public ApplicationUser(String s, String pass, Set<Role> roles) {
         this.username = s;
@@ -77,5 +101,23 @@ public class ApplicationUser {
                 ", password='" + password + '\'' +
                 ", roles=" + roles +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ApplicationUser)) return false;
+        ApplicationUser that = (ApplicationUser) o;
+        return Objects.equals(getUser_id(), that.getUser_id()) &&
+                Objects.equals(getUsername(), that.getUsername()) &&
+                Objects.equals(getPassword(), that.getPassword()) &&
+                Objects.equals(getRoles(), that.getRoles()) &&
+                Objects.equals(getAccounts(), that.getAccounts());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getUser_id(), getUsername(), getPassword(), getRoles(), getAccounts());
     }
 }

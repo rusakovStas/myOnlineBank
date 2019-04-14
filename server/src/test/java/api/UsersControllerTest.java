@@ -2,8 +2,11 @@ package api;
 
 import com.stasdev.backend.model.entitys.ApplicationUser;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RequestCallback;
 
 import java.util.List;
 import java.util.Map;
@@ -22,14 +25,14 @@ class UsersControllerTest extends CommonApiTest{
 
     @Test
     void allEndpointsSecured() {
-        ResponseEntity<String> all = nonAuth().restClientWithoutErrorHandler().getForEntity("/users/all", String.class);
-        assertThat(all.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+        ResponseEntity<String> allUsers = nonAuth().restClientWithoutErrorHandler().getForEntity("/users/all", String.class);
+        assertThat(allUsers.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
 
-        ResponseEntity<String> create = nonAuth().restClientWithoutErrorHandler().getForEntity("/users/create", String.class);
-        assertThat(create.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+        ResponseEntity<String> createUser = nonAuth().restClientWithoutErrorHandler().postForEntity("/users",null ,String.class);
+        assertThat(createUser.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
 
-        ResponseEntity<String> delete = nonAuth().restClientWithoutErrorHandler().getForEntity("/users/delete", String.class);
-        assertThat(delete.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
+        ResponseEntity<String> deleteUser = nonAuth().restClientWithoutErrorHandler().exchange("/users?username=user", HttpMethod.DELETE, null, String.class);
+        assertThat(deleteUser.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
     }
 
 
@@ -75,8 +78,8 @@ class UsersControllerTest extends CommonApiTest{
         createUserByAdmin(userName);
         checkUserExists(userName);
 
-        authAdmin().restClientWithoutErrorHandler()
-                .delete("/users/delete/"+userName);
+        authAdmin().restClientWithErrorHandler()
+                .delete("/users?username="+userName);
 
         checkUserNotExists(userName);
     }
@@ -100,42 +103,8 @@ class UsersControllerTest extends CommonApiTest{
         RuntimeException runtimeException = assertThrows(RuntimeException.class,
                 () -> authUser()
                 .restClientWithErrorHandler()
-                .delete("/users/delete/user"));
+                .delete("/users?username=user"));
         assertThat(runtimeException.getMessage(), containsString("Access is denied"));
-    }
-
-
-    private AccessToRestClient createUserByAdminAndAuth(String user){
-        ResponseEntity<ApplicationUser> userRs = authAdmin()
-                .restClientWithErrorHandler()
-                .postForEntity("/users/create", new ApplicationUser(user, "Password"), ApplicationUser.class);
-        return authByUser(userRs.getBody().getUsername(), "Password");
-    }
-
-    private void createUserByUser(String createdUser){
-        authUser()
-                .restClientWithErrorHandler()
-                .postForEntity("/users/create", new ApplicationUser(createdUser, "Password"), ApplicationUser.class);
-    }
-
-    private ResponseEntity<ApplicationUser> createUserByAdmin(String userName){
-        return authAdmin()
-                .restClientWithErrorHandler()
-                .postForEntity("/users/create", new ApplicationUser(userName, "Password"), ApplicationUser.class);
-    }
-
-    private void checkUserExists(String userName){
-        ResponseEntity<List> allUserRs = authAdmin().restClientWithoutErrorHandler()
-                .getForEntity("/users/all", List.class);
-        List<Map<String, String>> allUsers = allUserRs.getBody();
-        assertThat(allUsers.stream().filter(m -> m.containsValue(userName)).findAny().isPresent(), is(true));
-    }
-
-    private void checkUserNotExists(String userName){
-        ResponseEntity<List> allUserRs = authAdmin().restClientWithoutErrorHandler()
-                .getForEntity("/users/all", List.class);
-        List<Map<String, String>> allUsers = allUserRs.getBody();
-        assertThat(allUsers.stream().filter(m -> m.containsValue(userName)).findAny().isPresent(), is(false));
     }
 
 }

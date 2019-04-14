@@ -29,7 +29,7 @@ pipeline {
                             currentBuild.result = "SUCCESS"
                         }
                 }
-                sh "cd server && ./gradlew copyFrontBuildToPublic integrationTest -Dselenide.baseUrl=http://138.68.95.208 -Dselenide.browser=integration.SelenoidWebDriverProvider"
+                sh "cd server && ./gradlew copyFrontBuildToPublic integrationTest -Dselenide.baseUrl=http://138.68.95.208 -Dselenide.browser=integration.SelenoidWebDriverProvider -Dspring.profiles.active=firstStart"
             }
         post {
             always {

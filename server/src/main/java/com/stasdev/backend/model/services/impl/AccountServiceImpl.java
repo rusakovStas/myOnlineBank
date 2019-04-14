@@ -7,7 +7,7 @@ import com.stasdev.backend.model.repos.ApplicationUserRepository;
 import com.stasdev.backend.model.repos.RoleRepository;
 import com.stasdev.backend.model.repos.TransactionRepository;
 import com.stasdev.backend.model.services.AccountService;
-import javafx.util.Pair;
+import com.sun.tools.javac.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,15 +60,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private Suggestion mapAccountToSuggestion(Pair<String, Account> pair){
-        return new Suggestion(pair.getValue().getNumber(),
+        return new Suggestion(pair.snd.getNumber(),
                             isItOwnUserAccount(pair) ?
                                     "My own account"
-                                    : pair.getValue().getUser().getUsername(),
-                            pair.getValue().getId());
+                                    : pair.snd.getUser().getUsername(),
+                            pair.snd.getId());
     }
 
     private boolean isItOwnUserAccount(Pair<String, Account> pair){
-        return pair.getKey().equals(pair.getValue().getUser().getUsername());
+        return pair.fst.equals(pair.snd.getUser().getUsername());
     }
 
     @Override

@@ -7,7 +7,6 @@ import com.stasdev.backend.model.repos.ApplicationUserRepository;
 import com.stasdev.backend.model.repos.RoleRepository;
 import com.stasdev.backend.model.repos.TransactionRepository;
 import com.stasdev.backend.model.services.AccountService;
-import com.sun.tools.javac.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,15 +59,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private Suggestion mapAccountToSuggestion(Pair<String, Account> pair){
-        return new Suggestion(pair.snd.getNumber(),
+        return new Suggestion(pair.getValue().getNumber(),
                             isItOwnUserAccount(pair) ?
                                     "My own account"
-                                    : pair.snd.getUser().getUsername(),
-                            pair.snd.getId());
+                                    : pair.getValue().getUser().getUsername(),
+                            pair.getValue().getId());
     }
 
     private boolean isItOwnUserAccount(Pair<String, Account> pair){
-        return pair.fst.equals(pair.snd.getUser().getUsername());
+        return pair.getKey().equals(pair.getValue().getUser().getUsername());
     }
 
     @Override
@@ -159,4 +158,31 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new ThereIsNoAccountsWithId(String.format(NO_ACCOUNTS_WITH_ID, userTo.getUsername(), accountIdTo)));
     }
 
+    /*Без понятия почему, но на впс не находится этот класс*/
+    private class Pair<A,B> {
+        A key;
+        B value;
+
+        Pair(A key, B value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public A getKey() {
+            return key;
+        }
+
+        public void setKey(A key) {
+            this.key = key;
+        }
+
+        public B getValue() {
+            return value;
+        }
+
+        public void setValue(B value) {
+            this.value = value;
+        }
+
+    }
 }

@@ -24,3 +24,11 @@ task integrationTest(type: Test) {
     systemProperty "selenide.baseUrl", System.getProperty("selenide.baseUrl")
     systemProperty "selenide.browser", System.getProperty("selenide.browser")
 }
+
+task localAllTest(type: Test) {
+    useJUnitPlatform()
+    testLogging.showStandardStreams = true
+    include 'com/stasdev/backend/**/*'
+    include 'api/**/*'
+    include 'integration/**/*'
+}

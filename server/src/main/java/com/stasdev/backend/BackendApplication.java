@@ -83,10 +83,14 @@ public class BackendApplication {
 			ApplicationUser admin = repo.saveAndFlush(
 					new ApplicationUser("admin",
 							bCryptPasswordEncoder.encode("pass"), Collections.singleton(new Role("admin"))));
-			Account account = new Account(
+			Account godAccount = new Account(
 					new Amount("RUR", new BigDecimal("100000")),
 					"God account", admin);
-			accountRepository.saveAndFlush(preparer.prepareToSave(account));
+			accountRepository.saveAndFlush(preparer.prepareToSave(godAccount));
+			Account accountForDelete = new Account(
+					new Amount("RUR", new BigDecimal("100000")),
+					"God account", admin);
+			accountRepository.saveAndFlush(preparer.prepareToSave(accountForDelete));
 
 			ApplicationUser user = repo.saveAndFlush(
 					new ApplicationUser("user",
@@ -94,13 +98,17 @@ public class BackendApplication {
 							Collections.singleton(new Role("user"))));
 			Account accountForUser = new Account(
 					new Amount("RUR", new BigDecimal("1000")),
-					"", user);
+					"FirstAccount", user);
 			Account accountForUserTwo = new Account(
 					new Amount("RUR", new BigDecimal("10000")),
-					"", user);
+					"SecondAccount", user);
+			Account accountForUserThree = new Account(
+					new Amount("RUR", new BigDecimal("10000")),
+					"ThirdAccount", user);
 
 			accountRepository.saveAndFlush(preparer.prepareToSave(accountForUser));
 			accountRepository.saveAndFlush(preparer.prepareToSave(accountForUserTwo));
+			accountRepository.saveAndFlush(preparer.prepareToSave(accountForUserThree));
 		}
 	}
 
@@ -138,13 +146,17 @@ public class BackendApplication {
 							Collections.singleton(new Role("user"))));
 			Account accountForUser = new Account(
 					new Amount("RUR", new BigDecimal("1000")),
-					"", user);
+					"FirstAccount", user);
 			Account accountForUserTwo = new Account(
 					new Amount("RUR", new BigDecimal("10000")),
-					"", user);
+					"SecondAccount", user);
+			Account accountForUserThree = new Account(
+					new Amount("RUR", new BigDecimal("10000")),
+					"ThirdAccount", user);
 
 			accountRepository.saveAndFlush(preparer.prepareToSave(accountForUser));
 			accountRepository.saveAndFlush(preparer.prepareToSave(accountForUserTwo));
+			accountRepository.saveAndFlush(preparer.prepareToSave(accountForUserThree));
 		}
 	}
 }

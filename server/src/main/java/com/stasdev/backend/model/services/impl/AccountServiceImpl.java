@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,7 +80,7 @@ public class AccountServiceImpl implements AccountService {
     public Account nameAccount(Account account){
         return null;
     }
-    
+
     @Override
     @Transactional
     public void deleteAccount(String userName, Long id){
@@ -113,8 +112,8 @@ public class AccountServiceImpl implements AccountService {
                 throw new UserCanNotDoThisOperation(String.format("User '%s' hasn't role admin and can't do transaction from not his accounts", userFrom.getUsername()));
             }
 
-            Account accountFrom = getAccountFromUser(userFrom, transaction.getAccountIdFrom());
-            Account accountTo = getAccountFromUser(userTo, transaction.getAccountIdTo());
+            Account accountFrom = getAccountFromUserWithCheck(userFrom, transaction.getAccountIdFrom());
+            Account accountTo = getAccountFromUserWithCheck(userTo, transaction.getAccountIdTo());
 
             boolean accountFromBelongsToCurrentUser = currentUser.getAccounts().contains(accountFrom);
 
@@ -152,7 +151,7 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new UserNotFound(String.format("User with name %s not found", user)));
     }
 
-    Account getAccountFromUser(ApplicationUser userTo, Long accountIdTo) {
+    Account getAccountFromUserWithCheck(ApplicationUser userTo, Long accountIdTo) {
         return accountRepository.findAccountsByUser(userTo)
                 .stream()
                 .filter(a -> a.getId().equals(accountIdTo))

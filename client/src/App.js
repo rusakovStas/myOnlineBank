@@ -29,7 +29,7 @@ const App = ({ location, isAuthentifacated }) => (
     <GuestRoute location={location} path="/" exact component={LoginPage} />
     {isAuthentifacated && (
       <ReduxToastr
-        timeOut={4000}
+        timeOut={600000}
         newestOnTop={false}
         position="top-right"
         transitionIn="fadeIn"

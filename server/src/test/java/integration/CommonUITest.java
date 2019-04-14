@@ -1,9 +1,12 @@
 package integration;
 
 import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import com.stasdev.backend.BackendApplication;
+import common.ApiFunctions;
+import common.TestProperties;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.Rule;
 import org.junit.jupiter.api.*;
@@ -26,7 +29,7 @@ import static com.codeborne.selenide.Selenide.open;
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.properties")// переопределяем проперти для запуска
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)//Это необходимо что бы BeforeAll выполнялся после старта спринга (потому что будет выполняться только при создание инстанса тестового класса)
-public abstract class CommonUITest {
+abstract class CommonUITest extends ApiFunctions{
 
 //  Эти методы выполняются в отдельных потоках (при паралелльном запуске) поэтому сюда не следует помещать open
     @BeforeAll
@@ -39,5 +42,10 @@ public abstract class CommonUITest {
         SelenideLogger.removeListener("allure");
     }
 
+    @AfterEach
+    void logout(){
+        $(byText("logout")).click();
+        $(byText("Login")).shouldBe(visible);
+    }
 
 }

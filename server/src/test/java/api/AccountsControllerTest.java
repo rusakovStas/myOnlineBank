@@ -98,12 +98,7 @@ class AccountsControllerTest extends CommonApiTest {
     @Test
     void userCanSeeHisAccounts() {
         List<Account> accounts = getAccountsOfDefaultUser();
-        assertThat(accounts.size(), is(2));
-        Account account = accounts.get(1);
-
-        assertThat(account.getName(), is(""));
-        assertThat(account.getAmount().getCurrency(), is("RUR"));
-
+        assertThat(accounts.size(), is(3));
     }
 
     @Test
@@ -330,7 +325,7 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
-    void userCantDoTransactionFromNotExistingAccount() {
+    void userCanNotDoTransactionFromNotExistingAccount() {
         Account accFrom = getAccountsOfDefaultUser().get(0);
         BigDecimal sumFromBefore = accFrom.getAmount().getSum();
 
@@ -749,14 +744,6 @@ class AccountsControllerTest extends CommonApiTest {
         return Collections.singletonList(new WebSocketTransport(new StandardWebSocketClient()));
     }
 
-    private List<Account> getAccountsOfDefaultUser(){
-        ResponseEntity<List<Account>> userAccountsEntity = authUser()
-                .restClientWithoutErrorHandler().exchange("/accounts/my", HttpMethod.GET, null, new ParameterizedTypeReference<List<Account>>() {});
-        List<Account> accounts = userAccountsEntity.getBody();
-        assert accounts!=null;
-        return accounts;
-    }
-
     private List<Account> getAccountsOfAdminUser(){
         ResponseEntity<List<Account>> userAccountsEntity = authAdmin()
                 .restClientWithoutErrorHandler().exchange("/accounts/my", HttpMethod.GET, null, new ParameterizedTypeReference<List<Account>>() {});
@@ -765,41 +752,6 @@ class AccountsControllerTest extends CommonApiTest {
         return accounts;
     }
 
-    private List<Account> getAllAccountsByAdmin(){
-        ResponseEntity<List<Account>> userAccountsEntity = authAdmin()
-                .restClientWithoutErrorHandler().exchange("/accounts/all", HttpMethod.GET, null, new ParameterizedTypeReference<List<Account>>() {});
-        List<Account> accounts = userAccountsEntity.getBody();
-        assert accounts!=null;
-        return accounts;
-    }
-
-    private List<Account> getAccountsOfCreatedUser(String user){
-        ResponseEntity<List<Account>> userAccountsEntity = authByUser(user, DEFAULT_PASSWORD)
-                .restClientWithoutErrorHandler().exchange("/accounts/my", HttpMethod.GET, null, new ParameterizedTypeReference<List<Account>>() {});
-        List<Account> accounts = userAccountsEntity.getBody();
-        assert accounts!=null;
-        return accounts;
-    }
-
-    private List<Suggestion> getSuggestionsToDefaultUser(){
-        ResponseEntity<List<Suggestion>> suggestionsEntity = authUser()
-                .restClientWithoutErrorHandler()
-                .exchange("/accounts/suggestions", HttpMethod.GET,null, new ParameterizedTypeReference<List<Suggestion>>(){});
-
-        List<Suggestion> suggestions = suggestionsEntity.getBody();
-        assert suggestions != null;
-        return suggestions;
-    }
-
-    private List<Suggestion> getSuggestionsToCreatedUser(String user){
-        ResponseEntity<List<Suggestion>> suggestionsEntity = authByUser(user,DEFAULT_PASSWORD)
-                .restClientWithoutErrorHandler()
-                .exchange("/accounts/suggestions", HttpMethod.GET,null, new ParameterizedTypeReference<List<Suggestion>>(){});
-
-        List<Suggestion> suggestions = suggestionsEntity.getBody();
-        assert suggestions != null;
-        return suggestions;
-    }
 
     private ApplicationUser createUser(String userName){
         ResponseEntity<ApplicationUser> userByAdmin = createUserByAdmin(userName);

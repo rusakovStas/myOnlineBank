@@ -181,7 +181,7 @@ class Account extends React.Component {
 					<CardText onClick={() => toggle(account.id)}>
 						<large>
 							<p>
-								<b className="text-monospace">
+								<b className="text-monospace" id="money-in-the-account">
 									 {account.amount.sum}
 									<FontAwesomeIcon
 										icon="ruble-sign"
@@ -193,12 +193,12 @@ class Account extends React.Component {
 
 						<p className="text-monospace card-text text-right pl-1 mb-0">
 							<small>
-								<b>{account.number}</b>
+								<b id="account-number">{account.number}</b>
 							</small>
 						</p>
 
 						<p className="card-text text-right pl-1 mt-0">
-							<small className="text-muted">
+							<small className="text-muted" id="card-owner">
 								Owner: {account.user.username}
 							</small>
 						</p>
@@ -228,8 +228,9 @@ class Account extends React.Component {
 										}`
 									}
 									options={suggestions}
+									minLength={3}
 									placeholder="Type user name..."
-									className="pb-2"
+									className="pb-2 transaction-input-test"
 									onChange={this.handleOptionSelected}
 									selected={chosen}
 								/>
@@ -271,6 +272,7 @@ class Account extends React.Component {
 									</Col>
 									<Col xs="6" sm="4">
 										<Button
+											id="updateButton"
 											size="lg"
 											block
 											color="success"
@@ -278,7 +280,7 @@ class Account extends React.Component {
 										>
 											{!!account.name ||
 											account.name === ""
-												? "Edite"
+												? "Edit"
 												: "Name"}
 										</Button>
 									</Col>

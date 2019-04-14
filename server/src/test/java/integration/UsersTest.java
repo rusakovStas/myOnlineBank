@@ -33,12 +33,6 @@ public class UsersTest extends CommonUITest {
         $(byText("Admin")).shouldBe(visible);
     }
 
-    @AfterEach
-    void logout(){
-        $(byText("logout")).click();
-        $(byText("Login")).shouldBe(visible);
-    }
-
     @Test
     void adminCanCreateAndDeleteUser() {
         $(byText("Admin")).click();

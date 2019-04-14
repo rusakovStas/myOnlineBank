@@ -2,12 +2,17 @@ package integration;
 
 import com.codeborne.selenide.WebDriverProvider;
 import common.TestProperties;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SelenoidWebDriverProvider implements WebDriverProvider {
 
@@ -27,4 +32,5 @@ public class SelenoidWebDriverProvider implements WebDriverProvider {
             throw new RuntimeException(e);
         }
     }
+
 }

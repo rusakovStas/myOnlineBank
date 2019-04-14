@@ -1,4 +1,4 @@
-package integration;
+package common;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -17,7 +17,7 @@ public class TestProperties {
         }
     }
 
-    public static TestProperties getInstance(){
+    public synchronized static TestProperties getInstance(){
         if (instance == null){
             instance = new TestProperties();
         }

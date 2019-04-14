@@ -21,13 +21,18 @@ class TopNavigationBar extends React.Component {
     render() {
         const { logout } = this.props;
         return (
-            <Navbar color="dark" dark expand="md" className="fixed-top">
+            <Navbar color="dark" dark expand="md">
                 <NavbarBrand tag={Link} to="/home">
                     Home
                 </NavbarBrand>
                 <NavbarToggler onClick={this.toggle} />
                 <Collapse isOpen={this.state.isOpen} navbar>
                     <Nav className="ml-auto" navbar>
+                        <NavItem>
+                            <NavLink tag={Link} to="/accounts">
+                                Accounts
+                            </NavLink>
+                        </NavItem>
                         {this.props.hasRoleAdmin && (
                             <NavItem>
                                 <NavLink tag={Link} to="/admin">

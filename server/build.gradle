@@ -32,18 +32,20 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile("org.springframework.boot:spring-boot-starter-security")
+	compile('org.springframework.boot:spring-boot-starter-websocket')
 	compile group: 'org.springframework.security.oauth.boot', name: 'spring-security-oauth2-autoconfigure', version: '2.0.4.RELEASE'
 	compile('org.postgresql:postgresql')
 	compile("org.springframework.boot:spring-boot-starter-actuator")
 	compile("com.h2database:h2")
+	compile("org.springframework.boot:spring-boot-starter-websocket")
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 
 	testImplementation('org.junit.jupiter:junit-jupiter-api:5.3.1')
 	testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.3.1')
 
-
-	testImplementation('com.codeborne:selenide:5.0.1')
+	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.0'
+	testImplementation('com.codeborne:selenide:5.2.1')
 
 	testImplementation('io.qameta.allure:allure-selenide:2.8.1')
 	testRuntimeOnly('io.qameta.allure:allure-junit5:2.8.1')

@@ -2,12 +2,14 @@ package integration;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
+import common.TestProperties;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.byText;
+
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 import static com.codeborne.selenide.Selenide.open;
@@ -16,18 +18,19 @@ public class UsersTest extends CommonUITest {
 
     @BeforeEach
     void login(){
+        int appPort = TestProperties.getInstance().getAppPort();
+        Configuration.baseUrl = Configuration.baseUrl
+                .replace(":8080", "")
+                .replace("http://","");
+//      Эта команда откроет только один браузер в одном потоке, т.е. переоткрываться не будет при каждом тесте
+        open(String.format("http://%s:%d", Configuration.baseUrl, appPort));
+
         Selenide.clearBrowserLocalStorage();
         Configuration.timeout = 10_000;
         $("#email").setValue("admin");
         $("#password").setValue("pass");
         $(byText("Login")).click();
         $(byText("Admin")).shouldBe(visible);
-    }
-
-    @AfterEach
-    void logout(){
-        $(byText("logout")).click();
-        $(byText("Login")).shouldBe(visible);
     }
 
     @Test
@@ -67,7 +70,7 @@ public class UsersTest extends CommonUITest {
         $("#username").setValue("user");
         $("#password").setValue("pass");
         $(byText("Add")).click();
-        $(byText("User with name 'user' already exists!"));
+        $(byText("User with name 'user' already exists!")).shouldBe(visible);
         $(".close").click();
 
     }

@@ -2,6 +2,7 @@ import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 import { BrowserRouter, Route } from "react-router-dom";
 import thunk from "redux-thunk";
+import jwtDecode from "jwt-decode";
 import { composeWithDevTools } from "redux-devtools-extension";
 import axios from "axios";
 import React from "react";
@@ -11,7 +12,8 @@ import setAuthToken from "./utils/setAuthToken";
 import { userLoggedIn, userLoggedOut } from "./actions/auth";
 import App from "./App";
 import "./App.scss";
-import "font-awesome/css/font-awesome.min.css";
+import "animate.css/animate.min.css";
+import "react-bootstrap-typeahead/css/Typeahead.css";
 import * as serviceWorker from "./serviceWorker";
 
 const store = createStore(
@@ -21,6 +23,7 @@ const store = createStore(
 
 if (localStorage.tokenJWT && localStorage.roles) {
 	const user = {
+		name: jwtDecode(localStorage.tokenJWT).user_name,
 		access_token: localStorage.tokenJWT,
 		roles: JSON.parse(localStorage.roles)
 	};

@@ -22,8 +22,9 @@ $purple: #7015bd !default;
 $pink: #e83e8c !default;
 $red: #ed4040 !default;
 $orange: #fb9678 !default;
+$orangered: #ff4500 !default;
 $yellow: #fec107 !default;
-$green: #00c292 !default;
+$green: #17e832 !default;
 $teal: #20c997 !default;
 $cyan: #01c0c8 !default;
 $primary: #ed4040 !default;
@@ -65,30 +66,141 @@ $jumbotron-bg: $gray-100 !default;
 $navbar-brand-padding-y: 10px;
 
 $card-border-width: 0px !default;
-$card-border-radius: 0px !default;
-$enable-shadows: true !default;
+$card-border-radius: 20px !default;
+$alert-border-radius: 0px !default;
 
 .shadow {
-  background: #fc0; /* Цвет фона */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Параметры тени */
-  padding: 10px;
+  background: #e8e8e8; /* Цвет фона */
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)
 }
 
-.grow-on-hover {
+.grow-or-fall {
   position: relative;
-  z-index: 2;
   cursor: pointer;
   transition: 0.3s linear;
 }
-/* Небольшое увеличение при наведение */
-.grow-on-hover:hover {
-  -webkit-transform: scale(1.03);
-  transform: scale(1.03);
+.grow-on-hover {
+  @extend .grow-or-fall;
 }
 
+.fall-on-hover {
+  @extend .grow-or-fall;
+}
+/* Небольшое увеличение при наведение */
+.grow-on-hover:hover {
+  z-index: 2;
+  -webkit-transform: scale(1.02);
+  transform: scale(1.02);
+}
+
+.fall-on-hover:hover {
+  -webkit-transform: scale(0.98);
+  transform: scale(0.98);
+}
+
+.border-bottom {
+  border-bottom: 1px solid #e9ecef !important;
+}
+
+section {
+  width: 100%;
+  max-width: none;
+  text-align: center;
+  background-color: $gray-100;
+  height: 110vh;
+  color: black;
+}
+
+.account-item {
+background: linear-gradient(to right, #5B86E5, #36D1DC);
+
+
+
+  /*background: linear-gradient(to bottom right, $gray-800, $gray-900) !important;*/
+  /*Cover with cat*/
+
+  /*background: url(./components/Account/cat.jpg);*/
+
+  /*Dark simple cover with gradient*/
+
+  /*background: linear-gradient(
+      45deg,
+      rgba(103, 0, 31, 0.8),
+      rgba(34, 101, 163, 0.5)
+    ),
+    url(./components/Account/cover.jpg);*/
+
+  /*Cover with flowers*/
+
+  /*  background: linear-gradient(
+      45deg,
+      rgba(103, 0, 31, 0.8),
+      rgba(34, 101, 163, 0.5)
+    ),
+    url(./components/Account/cover_flowers.jpg);*/
+  border-radius: 10px;
+  background-size: cover;
+}
+
+.input-in-header {
+  background: transparent !important;
+}
+
+.intro-section {
+  background-color: $gray-800;
+  height: calc(
+    100vh - 4rem
+  ); /*вычисляем высоту экрана с учетом navbar в responsive еденицах*/
+  color: white;
+}
+
+.account-section {
+  background-color: $orangered;
+  color: white;
+}
+
+/* Делаем отступ снизу что бы зафиксированная кнопка влезала */
 body {
-  padding-top: 4.7rem; /*добавляем отступ сверху для зафиксированного навбара*/
+  padding-bottom: 5rem;
+
+}
+
+/*Test markers*/
+.transaction-input-test{
+
+}
+
+.money-in-the-account{
+
 }
 
 @import "bootstrap/scss/bootstrap.scss";
-/*@import "~font-awesome/scss/font-awesome.scss";*/
+@import "react-redux-toastr/src/styles/index.scss";
+
+html {
+  font-size: 1rem;
+}
+
+@include media-breakpoint-up(sm) {
+  html {
+    font-size: 1.4rem;
+  }
+}
+
+@include media-breakpoint-up(md) {
+  html {
+    font-size: 1.4rem;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  html {
+    font-size: 1rem;
+  }
+  .card {
+    font-size: 1.6rem;
+  }
+  .card-title {
+    font-size: 1.6rem;
+  }
+}

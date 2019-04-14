@@ -3,6 +3,7 @@ package com.stasdev.backend.auth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,9 +47,15 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .anonymous().disable()
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers("/users/all").hasRole("ADMIN")
-                .antMatchers("/users/create").hasRole("ADMIN")
-                .antMatchers("/users/delete/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/users/all").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST,"/users").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE,"/users/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET,"/accounts/all").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE,"/accounts/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers(HttpMethod.POST,"/accounts/**").hasAnyRole("ADMIN", "USER")
+                .antMatchers(HttpMethod.GET, "/accounts/my").hasAnyRole("ADMIN", "USER")
+                .antMatchers(HttpMethod.POST, "/accounts/transaction").hasAnyRole("ADMIN", "USER")
+                .antMatchers(HttpMethod.GET, "/accounts/suggestions").hasAnyRole("ADMIN", "USER")
 //                    .anyRequest().authenticated() //все что не указано явным образом - требует авторизации - почему то закрывает ресурсы с сайтом тоже
                 .and()
                 .exceptionHandling()

@@ -735,7 +735,7 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
-    void adminCanCreateNewSimpleAccount() {
+    void adminCanCreateAccount() {
         Account accountForCreation = new Account();
         ApplicationUser adminUser = new ApplicationUser();
         adminUser.setUsername("admin");

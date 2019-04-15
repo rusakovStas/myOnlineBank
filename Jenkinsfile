@@ -61,7 +61,7 @@ pipeline {
                     }
                 sh "cd server && chmod +x gradlew"
                 sh "cd server && ./gradlew clean copyFrontBuildToPublic build -x test"
-                sh "cd server/build/libs/ && JENKINS_NODE_COOKIE=dontKillMe nohup java -jar -Dspring.profiles.active=firstStart backend-0.0.1-SNAPSHOT.jar >/dev/null 2>&1 &"
+                sh "cd server/build/libs/ && JENKINS_NODE_COOKIE=dontKillMe nohup java -jar backend-0.0.1-SNAPSHOT.jar >/dev/null 2>&1 &"
             }
         }
     }

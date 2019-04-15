@@ -5,34 +5,30 @@ import AccountForm from "./Form";
 import {
 	getAllAccounts,
 	getMyAccounts,
-	// createAccount,
+	createAccount,
 	deleteAccount
 	// editeAccount,
 } from "../../actions/accounts";
 import api from "../../api/api";
 
 class AccountPage extends React.Component {
-	state = { suggestions: [] };
-
 	componentDidMount() {
 		if (this.props.hasRoleAdmin) {
 			this.props.getAllAccounts(this.props.currentUser);
 		} else {
 			this.props.getMyAccounts(this.props.currentUser);
 		}
-		api.account
-			.getSuggestions()
-			.then(res => this.setState({ suggestions: res }));
 	}
 
 	render() {
 		return (
 			<AccountForm
 				accounts={this.props.accounts}
-				suggestions={this.state.suggestions}
+				getSuggestions={api.account.getSuggestions}
 				transaction={api.account.createTransaction}
 				decline={this.props.deleteAccount}
 				currentUser={this.props.currentUser}
+				create={this.props.createAccount}
 			/>
 		);
 	}
@@ -63,7 +59,7 @@ export default connect(
 	mapStateToProps,
 	{
 		getAllAccounts,
-		// createAccount,
+		createAccount,
 		deleteAccount,
 		getMyAccounts
 		// editeAccount,

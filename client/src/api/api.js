@@ -45,6 +45,10 @@ export default {
 				.get(`http://${BASE_URL}/accounts/suggestions`)
 				.then(res => res.data),
 		createTransaction: transaction =>
-			axios.post(`http://${BASE_URL}/accounts/transaction`, transaction)
+			axios.post(`http://${BASE_URL}/accounts/transaction`, transaction),
+		createAccount: account =>
+			axios
+				.post(`http://${BASE_URL}/accounts`, account)
+				.then(res => res.data)
 	}
 };

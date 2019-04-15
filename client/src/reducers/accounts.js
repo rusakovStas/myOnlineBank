@@ -10,7 +10,7 @@ export default function user(state = [], action) {
 		case GET_ACCOUNTS:
 			return action.accounts;
 		case ADD_ACCOUNT:
-			return state.concat(action.user);
+			return state.concat(action.account);
 		case UPDATE_ACCOUNT:
 			return state.map(item =>
 				item.id === action.account.id

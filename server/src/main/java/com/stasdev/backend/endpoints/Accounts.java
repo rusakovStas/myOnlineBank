@@ -28,9 +28,12 @@ public class Accounts {
         return accountService.getMyAccount(authentication.getName());
     }
 
+    /*
+    TODO вообще то сюда достаточно скинуть чисто имя юзера (что по факту и будет), но на будущее оставлю здесь Account
+    * */
     @PostMapping
     Account createAccount(@RequestBody Account account){
-        throw new NotImplementedYet("Operation 'Create' not implemented yet");
+        return accountService.createAccount(account);
     }
 
     @PutMapping

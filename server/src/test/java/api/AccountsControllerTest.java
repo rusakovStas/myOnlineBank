@@ -1,6 +1,7 @@
 package api;
 
 import com.stasdev.backend.model.entitys.*;
+import com.stasdev.backend.model.services.impl.PreparerImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
@@ -700,6 +702,37 @@ class AccountsControllerTest extends CommonApiTest {
         assertThat(sizeAccountsDeletedUsers, equalTo(0));
     }
 
+    @Test
+    void userCanCreateNewAccount() {
+        Account accountForCreation = new Account();
+        ApplicationUser defaultUser = new ApplicationUser();
+        defaultUser.setUsername("user");
+        accountForCreation.setUser(defaultUser);
+        List<Account> accountsOfDefaultUserBeforeCreation = getAccountsOfDefaultUser();
+        int sizeBeforeCreation = accountsOfDefaultUserBeforeCreation.size();
+
+
+        ResponseEntity<Account> createdAccountAsResponse = authUser().restClientWithoutErrorHandler().postForEntity("/accounts", accountForCreation, Account.class);
+
+        List<Account> accountsOfDefaultUserAfterCreation = getAccountsOfDefaultUser();
+        int sizeAfterCreation = accountsOfDefaultUserAfterCreation.size();
+        assertThat(sizeAfterCreation, is(sizeBeforeCreation + 1));
+        List<Account> createdAccount = accountsOfDefaultUserAfterCreation
+                .stream()
+                .filter(a -> !accountsOfDefaultUserBeforeCreation.contains(a))
+                .collect(Collectors.toList());
+        assertThat(createdAccount.size(), is(1));
+        Account account = createdAccount.get(0);
+        assertThat(account, is(createdAccountAsResponse.getBody()));
+        assertThat(account.getUser().getUsername(), is(defaultUser.getUsername()));
+        BigDecimal expected = new BigDecimal(new BigInteger("0"));
+        expected = expected.setScale(2);
+        assertThat(account.getAmount().getSum(), is(expected));
+        assertThat(account.getAmount().getCurrency(), is("RUR"));
+        assertThat(account.getName(), isEmptyOrNullString());
+        assertThat(account.getNumber().matches(String.format("%s \\d{4} \\d{4}", PreparerImpl.prefixOfAccountNumber)), is(true));
+        assertThat(account.getId(), notNullValue());
+    }
 
     private WebSocketStompClient getStompClient() {
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(createTransportClient()));

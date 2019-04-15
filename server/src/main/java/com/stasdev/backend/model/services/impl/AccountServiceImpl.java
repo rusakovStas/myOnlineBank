@@ -7,6 +7,7 @@ import com.stasdev.backend.model.repos.ApplicationUserRepository;
 import com.stasdev.backend.model.repos.RoleRepository;
 import com.stasdev.backend.model.repos.TransactionRepository;
 import com.stasdev.backend.model.services.AccountService;
+import com.stasdev.backend.model.services.Preparer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,14 +28,16 @@ public class AccountServiceImpl implements AccountService {
     private final ApplicationUserRepository userRepository;
     private final RoleRepository roleRepository;
     private final SocketServiceImpl socketService;
+    private final Preparer preparer;
 
     @Autowired
-    public AccountServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository, ApplicationUserRepository userRepository, RoleRepository roleRepository, SocketServiceImpl socketService) {
+    public AccountServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository, ApplicationUserRepository userRepository, RoleRepository roleRepository, SocketServiceImpl socketService, Preparer preparer) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.socketService = socketService;
+        this.preparer = preparer;
     }
 
     @Override
@@ -72,7 +76,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account createAccount(Account account){
-        throw new NotImplementedYet("Operation 'Create' not implemented yet");
+        String username = Optional.of(account.getUser().getUsername()).orElseThrow(() -> new RuntimeException("User not specified"));
+        ApplicationUser user = userRepository.getApplicationUserByUsername(username).orElseThrow(() -> new UserNotFound(String.format("User with name '%s' not found", username)));
+        Account createdAccount = new Account();
+        createdAccount.setUser(user);
+        createdAccount.setAmount(new Amount("RUR", new BigDecimal("0")));
+        return accountRepository.saveAndFlush(preparer.prepareToSave(createdAccount));
     }
 
     @Override

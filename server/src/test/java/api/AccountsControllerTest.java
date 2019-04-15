@@ -705,26 +705,26 @@ class AccountsControllerTest extends CommonApiTest {
     @Test
     void userCanCreateNewAccount() {
         Account accountForCreation = new Account();
-        ApplicationUser defaultUser = new ApplicationUser();
-        defaultUser.setUsername("user");
-        accountForCreation.setUser(defaultUser);
-        List<Account> accountsOfDefaultUserBeforeCreation = getAccountsOfDefaultUser();
-        int sizeBeforeCreation = accountsOfDefaultUserBeforeCreation.size();
+        String userName = "userForCheckCreationOfAccount";
+        ApplicationUser userForCheckCreationOfAccount = createUser(userName);
+        accountForCreation.setUser(userForCheckCreationOfAccount);
+        List<Account> accountsOfCreatedUserBeforeCreation = getAccountsOfCreatedUser(userName);
+        int sizeBeforeCreation = accountsOfCreatedUserBeforeCreation.size();
 
 
         ResponseEntity<Account> createdAccountAsResponse = authUser().restClientWithoutErrorHandler().postForEntity("/accounts", accountForCreation, Account.class);
 
-        List<Account> accountsOfDefaultUserAfterCreation = getAccountsOfDefaultUser();
-        int sizeAfterCreation = accountsOfDefaultUserAfterCreation.size();
+        List<Account> accountsOfCreatedUserAfterCreation = getAccountsOfCreatedUser(userName);
+        int sizeAfterCreation = accountsOfCreatedUserAfterCreation.size();
         assertThat(sizeAfterCreation, is(sizeBeforeCreation + 1));
-        List<Account> createdAccount = accountsOfDefaultUserAfterCreation
+        List<Account> createdAccount = accountsOfCreatedUserAfterCreation
                 .stream()
-                .filter(a -> !accountsOfDefaultUserBeforeCreation.contains(a))
+                .filter(a -> !accountsOfCreatedUserBeforeCreation.contains(a))
                 .collect(Collectors.toList());
         assertThat(createdAccount.size(), is(1));
         Account account = createdAccount.get(0);
         assertThat(account, is(createdAccountAsResponse.getBody()));
-        assertThat(account.getUser().getUsername(), is(defaultUser.getUsername()));
+        assertThat(account.getUser().getUsername(), is(userForCheckCreationOfAccount.getUsername()));
         BigDecimal expected = new BigDecimal(new BigInteger("0"));
         expected = expected.setScale(2);
         assertThat(account.getAmount().getSum(), is(expected));

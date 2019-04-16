@@ -27,13 +27,7 @@ class AccountForm extends React.Component {
 				username: this.props.currentUser
 			}
 		};
-		this.props
-			.create(account)
-			.then(() =>
-				this.props
-					.getSuggestions()
-					.then(res => this.setState({ suggestions: res }))
-			);
+		this.props.create(account);
 	};
 
 	render() {
@@ -57,7 +51,7 @@ class AccountForm extends React.Component {
 									account={acc}
 									open={this.state.collapse === acc.id}
 									toggle={this.toggle}
-									suggestions={this.state.suggestions}
+									getSuggestions={this.props.getSuggestions}
 									transaction={this.props.transaction}
 									decline={this.props.decline}
 								/>

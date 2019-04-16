@@ -101,20 +101,20 @@ public class Account {
         Transaction(){}
 
         public Transaction chooseAccountToFromSuggestions(Account accountTo){
-            if (getOwnerName().equals(accountTo.getOwnerName())){
-                transactionInput.setValue("My own account");
-            }else {
-                transactionInput.setValue(accountTo.getOwnerName());
-            }
-            transactionInput.scrollTo();//что бы suggestions уместились
-            transactionSuggestions
-                    .shouldHave(sizeGreaterThan(0))
-                    .exclude(not(text(accountTo.getNumber().split(" ")[3])))
-                    .shouldHave(size(1))
-                    .first()
-                    .click();
-            return this;
-        }
+             if (getOwnerName().equals(accountTo.getOwnerName())){
+                 transactionInput.setValue("My own account");
+             }else {
+                 transactionInput.setValue(accountTo.getOwnerName());
+             }
+             transactionInput.scrollTo();//что бы suggestions уместились
+             transactionSuggestions
+                     .shouldHave(sizeGreaterThan(0))
+                     .exclude(not(text(accountTo.getNumber().split(" ")[3])))
+                     .shouldHave(size(1))
+                     .first()
+                     .click();
+             return this;
+         }
 
          public Transaction chooseAccountToFromSuggestionsByAdmin(String adminName, Account accountTo){
              if (adminName.equals(accountTo.getOwnerName())){
@@ -142,6 +142,15 @@ public class Account {
                      .first()
                      .click();
              return this;
+         }
+
+         public void checkThatSuggestionsNotHaveAccountTo(String userName, String numberOfAccount){
+             transactionInput.setValue(userName);
+             transactionSuggestions
+                     .shouldHave(sizeGreaterThan(0))
+                     .exclude(not(text(userName)))
+                     .exclude(not(text(numberOfAccount.split(" ")[3])))
+                     .shouldHave(size(0));
          }
 
         public TerminalOperation setAmountOfTransaction(String amount){

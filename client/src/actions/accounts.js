@@ -56,3 +56,8 @@ export const deleteAccount = accountId => dispatch =>
 	api.account.deleteAccount(accountId).then(() => {
 		dispatch(del(accountId));
 	});
+
+export const createAccount = account => dispatch =>
+	api.account.createAccount(account).then(response => {
+		dispatch(addAccount(response));
+	});

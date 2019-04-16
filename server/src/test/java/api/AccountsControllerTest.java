@@ -1,6 +1,7 @@
 package api;
 
 import com.stasdev.backend.model.entitys.*;
+import com.stasdev.backend.model.services.impl.PreparerImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
@@ -700,6 +702,69 @@ class AccountsControllerTest extends CommonApiTest {
         assertThat(sizeAccountsDeletedUsers, equalTo(0));
     }
 
+    @Test
+    void userCanCreateNewAccount() {
+        Account accountForCreation = new Account();
+        String userName = "userForCheckCreationOfAccount";
+        ApplicationUser userForCheckCreationOfAccount = createUser(userName);
+        accountForCreation.setUser(userForCheckCreationOfAccount);
+        List<Account> accountsOfCreatedUserBeforeCreation = getAccountsOfCreatedUser(userName);
+        int sizeBeforeCreation = accountsOfCreatedUserBeforeCreation.size();
+
+
+        ResponseEntity<Account> createdAccountAsResponse = authUser().restClientWithoutErrorHandler().postForEntity("/accounts", accountForCreation, Account.class);
+
+        List<Account> accountsOfCreatedUserAfterCreation = getAccountsOfCreatedUser(userName);
+        int sizeAfterCreation = accountsOfCreatedUserAfterCreation.size();
+        assertThat(sizeAfterCreation, is(sizeBeforeCreation + 1));
+        List<Account> createdAccount = accountsOfCreatedUserAfterCreation
+                .stream()
+                .filter(a -> !accountsOfCreatedUserBeforeCreation.contains(a))
+                .collect(Collectors.toList());
+        assertThat(createdAccount.size(), is(1));
+        Account account = createdAccount.get(0);
+        assertThat(account, is(createdAccountAsResponse.getBody()));
+        assertThat(account.getUser().getUsername(), is(userForCheckCreationOfAccount.getUsername()));
+        BigDecimal expected = new BigDecimal(new BigInteger("0"));
+        expected = expected.setScale(2);
+        assertThat(account.getAmount().getSum(), is(expected));
+        assertThat(account.getAmount().getCurrency(), is("RUR"));
+        assertThat(account.getName(), isEmptyOrNullString());
+        assertThat(account.getNumber().matches(String.format("%s \\d{4} \\d{4}", PreparerImpl.prefixOfAccountNumber)), is(true));
+        assertThat(account.getId(), notNullValue());
+    }
+
+    @Test
+    void adminCanCreateAccount() {
+        Account accountForCreation = new Account();
+        ApplicationUser adminUser = new ApplicationUser();
+        adminUser.setUsername("admin");
+        accountForCreation.setUser(adminUser);
+        List<Account> accountsOfAdminUserBeforeCreation = getAccountsOfAdminUser();
+        int sizeBeforeCreation = accountsOfAdminUserBeforeCreation.size();
+
+
+        ResponseEntity<Account> createdAccountAsResponse = authAdmin().restClientWithoutErrorHandler().postForEntity("/accounts", accountForCreation, Account.class);
+
+        List<Account> accountsOfAdminUserAfterCreation = getAccountsOfAdminUser();
+        int sizeAfterCreation = accountsOfAdminUserAfterCreation.size();
+        assertThat(sizeAfterCreation, is(sizeBeforeCreation + 1));
+        List<Account> createdAccount = accountsOfAdminUserAfterCreation
+                .stream()
+                .filter(a -> !accountsOfAdminUserBeforeCreation.contains(a))
+                .collect(Collectors.toList());
+        assertThat(createdAccount.size(), is(1));
+        Account account = createdAccount.get(0);
+        assertThat(account, is(createdAccountAsResponse.getBody()));
+        assertThat(account.getUser().getUsername(), is(adminUser.getUsername()));
+        BigDecimal expected = new BigDecimal(new BigInteger("0"));
+        expected = expected.setScale(2);
+        assertThat(account.getAmount().getSum(), is(expected));
+        assertThat(account.getAmount().getCurrency(), is("RUR"));
+        assertThat(account.getName(), isEmptyOrNullString());
+        assertThat(account.getNumber().matches(String.format("%s \\d{4} \\d{4}", PreparerImpl.prefixOfAccountNumber)), is(true));
+        assertThat(account.getId(), notNullValue());
+    }
 
     private WebSocketStompClient getStompClient() {
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(createTransportClient()));

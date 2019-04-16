@@ -9,12 +9,25 @@ import java.util.stream.Collectors;
 
 import static com.codeborne.selenide.CollectionCondition.size;
 import static com.codeborne.selenide.CollectionCondition.sizeGreaterThan;
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.byText;
+import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
 public class AccountsPage {
 
     public AccountsPage(){
+    }
+
+    public SelenideElement getCreateNewAccountButton() {
+        return $(byText("Add new account"));
+    }
+
+    public void createNewAccount(){
+        int sizeBeforeCreation = getAccounts().size();
+        $(byText("Add new account")).shouldBe(enabled).click();
+        $$(".account-item")
+                .shouldHave(size(sizeBeforeCreation + 1));
     }
 
     private List<Account> getAccounts() {
@@ -28,12 +41,13 @@ public class AccountsPage {
     public List<Account> getAccountsByUserName(String userName){
         return $$(".account-item")
                 .shouldHave(sizeGreaterThan(0))
-                .exclude(Condition.not(Condition.text(userName)))
+                .exclude(not(text(userName)))
                 .shouldHave(sizeGreaterThan(0))
                 .stream()
                 .map(Account::new)
                 .collect(Collectors.toList());
     }
+
 
     public Account getAccountWithIndex(int index){
         return getAccounts().get(index);
@@ -46,7 +60,7 @@ public class AccountsPage {
     public void accountsOfUserShouldHave(String userName, CollectionCondition condition){
         $$(".account-item")
                 .shouldHave(sizeGreaterThan(0))
-                .exclude(Condition.not(Condition.text(userName)))
+                .exclude(not(text(userName)))
                 .shouldHave(condition);
     }
 

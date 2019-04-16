@@ -46,7 +46,7 @@ public class AccountTests extends CommonUITest {
         login(defaultUser, "pass");
         $(byText("Accounts")).click();
         AccountsPage accountsPage = new AccountsPage();
-        accountsPage.accountsShouldHave(size(3));
+        int sizeBeforeDeleting = getAccountsOfDefaultUser().size();
 
         accountsPage
                 .getAccountWithIndex(0)
@@ -54,7 +54,7 @@ public class AccountTests extends CommonUITest {
                 .checkWarningMessage()
                 .execute();
 
-        accountsPage.accountsShouldHave(size(2));
+        accountsPage.accountsShouldHave(size(sizeBeforeDeleting - 1));
     }
 
     @Test
@@ -258,7 +258,11 @@ public class AccountTests extends CommonUITest {
         $(byText("Accounts")).click();
 
         AccountsPage accountsPage = new AccountsPage();
-        accountsPage.accountsOfUserShouldHave(adminName, size(2));
+        int sizeBeforeDeleting = getAllAccountsByAdmin()
+                .stream()
+                .filter(a -> a.getUser().getUsername().equals(adminName))
+                .collect(Collectors.toList())
+                .size();
 
         accountsPage
                 .getAccountsByUserName(adminName)
@@ -267,6 +271,71 @@ public class AccountTests extends CommonUITest {
                 .checkWarningMessage()
                 .execute();
 
-        accountsPage.accountsOfUserShouldHave(adminName, size(1));
+        accountsPage.accountsOfUserShouldHave(adminName, size(sizeBeforeDeleting - 1));
     }
+
+    @Test
+    void userCanCreateNewAccountAndDoTransactionToIt() {
+        String newUser = "newUser";
+        String amountOfTransaction = "100";
+        createUserByAdmin(newUser); //То что созданный юзер имеет дефолтный счет проверялось на апи тестах
+        login(newUser, DEFAULT_PASSWORD);
+        $(byText("Accounts")).click();
+        AccountsPage accountsPage = new AccountsPage();
+        accountsPage.createNewAccount();
+
+        accountsPage.accountsShouldHave(size(2));
+        Account createdAccount = accountsPage.getAccountWithIndex(1);
+        Account firstAccount = accountsPage.getAccountWithIndex(0);
+
+        firstAccount.beginTransaction()
+                .chooseAccountToFromSuggestions(createdAccount)
+                .setAmountOfTransaction(amountOfTransaction)
+                .execute();
+
+        createdAccount.accountMoneyShouldHave(text(amountOfTransaction));
+        accountsPage.checkPushAboutTransactionToOwnAccountAndCloseThem(newUser);
+    }
+
+    @Test
+    void adminCanCreateNewAccount() {
+        String adminName = "admin";
+
+        login(adminName, "pass");
+        $(byText("Accounts")).click();
+        AccountsPage accountsPage = new AccountsPage();
+        int sizeBeforeCreation = getAllAccountsByAdmin()
+                .stream()
+                .filter(a -> a.getUser().getUsername().equals(adminName))
+                .collect(Collectors.toList())
+                .size();
+
+        accountsPage.createNewAccount();
+
+        accountsPage.accountsOfUserShouldHave(adminName, size(sizeBeforeCreation + 1));
+    }
+
+    @Test
+    void userCanNotSeeAccountInSuggestionsWhichDeleted() {
+        String newUserForCheckDeleteSuggestions = "newUserForCheckDeleteSuggestions";
+        createUserByAdmin(newUserForCheckDeleteSuggestions);
+        login(newUserForCheckDeleteSuggestions, DEFAULT_PASSWORD);
+        $(byText("Accounts")).click();
+        AccountsPage accountsPage = new AccountsPage();
+        accountsPage.getCreateNewAccountButton().shouldBe(enabled).click();
+        accountsPage.accountsShouldHave(size(2));
+
+        Account accountForDelete = accountsPage.getAccountWithIndex(1);
+        String number = accountForDelete.getNumber();
+        accountForDelete
+                .beginDeleteAccount()
+                .checkWarningMessage()
+                .execute();
+
+        accountsPage.getAccountWithIndex(0)
+                .beginTransaction()
+                .checkThatSuggestionsNotHaveAccountTo("My ", number);
+    }
+
+
 }

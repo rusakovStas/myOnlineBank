@@ -1,13 +1,19 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Container, Row, Col, Button } from "reactstrap";
-import { toastr } from "react-redux-toastr";
 import Account from "./Account";
 
 class AccountForm extends React.Component {
 	state = {
-		collapse: -1
+		collapse: -1,
+		suggestions: []
 	};
+
+	componentDidMount() {
+		this.props
+			.getSuggestions()
+			.then(res => this.setState({ suggestions: res }));
+	}
 
 	toggle = index => {
 		this.setState({
@@ -15,10 +21,19 @@ class AccountForm extends React.Component {
 		});
 	};
 
+	createNewAccount = () => {
+		const account = {
+			user: {
+				username: this.props.currentUser
+			}
+		};
+		this.props.create(account);
+	};
+
 	render() {
 		return (
 			<div>
-				 <Container>
+				<Container>
 					<Row>
 						<Col
 							sm="12"
@@ -36,7 +51,7 @@ class AccountForm extends React.Component {
 									account={acc}
 									open={this.state.collapse === acc.id}
 									toggle={this.toggle}
-									suggestions={this.props.suggestions}
+									getSuggestions={this.props.getSuggestions}
 									transaction={this.props.transaction}
 									decline={this.props.decline}
 								/>
@@ -47,9 +62,7 @@ class AccountForm extends React.Component {
 						<Button
 							size="lg"
 							color="primary"
-							onClick={() =>
-								toastr.success("The title", "The message")
-							}
+							onClick={this.createNewAccount}
 						>
 							Add new account
 						</Button>
@@ -64,8 +77,9 @@ AccountForm.propTypes = {
 	transaction: PropTypes.func.isRequired,
 	decline: PropTypes.func.isRequired,
 	edite: PropTypes.func.isRequired,
+	create: PropTypes.func.isRequired,
 	accounts: PropTypes.arrayOf.isRequired,
-	suggestions: PropTypes.arrayOf.isRequired,
+	getSuggestions: PropTypes.func.isRequired,
 	currentUser: PropTypes.string.isRequired
 };
 

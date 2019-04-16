@@ -23,13 +23,17 @@ class Account extends React.Component {
 		block: false,
 		loading: false,
 		chosen: [],
-		transactionData: {}
+		transactionData: {},
+		suggestions: []
 	};
 
 	constructor(props) {
 		super(props);
 		// create a ref to store the button DOM element
 		this.inputForName = React.createRef();
+		this.props
+			.getSuggestions()
+			.then(res => this.setState({ suggestions: res }));
 	}
 
 	componentDidUpdate(prevProps, prevState) {
@@ -47,6 +51,10 @@ class Account extends React.Component {
 	};
 
 	toggleTransaction = () => {
+		// По хорошему нужно делать loading, но пока вроде нет проблем оставлю так
+		this.props
+			.getSuggestions()
+			.then(res => this.setState({ suggestions: res }));
 		this.setState({
 			transaction: true,
 			openTransaction: !this.state.openTransaction && this.props.open,
@@ -154,7 +162,7 @@ class Account extends React.Component {
 		});
 
 	render() {
-		const { account, open, toggle, suggestions, currentUser } = this.props;
+		const { account, open, toggle, currentUser } = this.props;
 		const {
 			openTransaction,
 			confirm,
@@ -162,6 +170,7 @@ class Account extends React.Component {
 			block,
 			loading,
 			chosen,
+			suggestions,
 			transaction
 		} = this.state;
 		return (
@@ -181,8 +190,11 @@ class Account extends React.Component {
 					<CardText onClick={() => toggle(account.id)}>
 						<large>
 							<p>
-								<b className="text-monospace" id="money-in-the-account">
-									 {account.amount.sum}
+								<b
+									className="text-monospace"
+									id="money-in-the-account"
+								>
+									{account.amount.sum}
 									<FontAwesomeIcon
 										icon="ruble-sign"
 										size="1x"
@@ -221,9 +233,7 @@ class Account extends React.Component {
 										</div>
 									)}
 									labelKey={option =>
-										`${
-											option.maskAccountNumber
-										} ${
+										`${option.maskAccountNumber} ${
 											option.userName
 										}`
 									}
@@ -264,7 +274,10 @@ class Account extends React.Component {
 											block
 											color="danger"
 											className="mb-2"
-											disabled={account.user.username !== currentUser}
+											disabled={
+												account.user.username !==
+												currentUser
+											}
 											onClick={this.toggleBlock}
 										>
 											Block
@@ -345,10 +358,7 @@ Account.propTypes = {
 			currency: PropTypes.string.isRequired
 		}).isRequired
 	}).isRequired,
-	suggestions: PropTypes.shape({
-		userName: PropTypes.string.isRequired,
-		account: PropTypes.string.isRequired
-	}).isRequired,
+	getSuggestions: PropTypes.func.isRequired,
 	open: PropTypes.bool.isRequired,
 	toggle: PropTypes.func.isRequired
 };

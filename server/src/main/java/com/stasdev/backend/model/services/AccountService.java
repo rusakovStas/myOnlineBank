@@ -16,7 +16,7 @@ public interface AccountService {
 
     Account createAccount(Account account);
 
-    Account nameAccount(Account account);
+    Account nameAccount(String userName, Account account);
 
     void deleteAccount(String userName, Long id);
 

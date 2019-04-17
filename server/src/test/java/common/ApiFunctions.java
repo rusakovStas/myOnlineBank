@@ -238,4 +238,19 @@ public abstract class ApiFunctions {
         return suggestions;
     }
 
+    protected ApplicationUser createUser(String userName){
+        ResponseEntity<ApplicationUser> userByAdmin = createUserByAdmin(userName);
+        ApplicationUser body = userByAdmin.getBody();
+        assert body!=null;
+        return body;
+    }
+
+    protected List<Account> getAccountsOfAdminUser(){
+        ResponseEntity<List<Account>> userAccountsEntity = authAdmin()
+                .restClientWithoutErrorHandler().exchange("/accounts/my", HttpMethod.GET, null, new ParameterizedTypeReference<List<Account>>() {});
+        List<Account> accounts = userAccountsEntity.getBody();
+        assert accounts!=null;
+        return accounts;
+    }
+
 }

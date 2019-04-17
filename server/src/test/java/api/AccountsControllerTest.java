@@ -1,12 +1,11 @@
 package api;
 
+import com.stasdev.backend.errors.NotImplementedYet;
 import com.stasdev.backend.model.entitys.*;
 import com.stasdev.backend.model.services.impl.PreparerImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
@@ -734,6 +733,7 @@ class AccountsControllerTest extends CommonApiTest {
         assertThat(account.getId(), notNullValue());
     }
 
+
     @Test
     void adminCanCreateAccount() {
         Account accountForCreation = new Account();
@@ -765,6 +765,7 @@ class AccountsControllerTest extends CommonApiTest {
         assertThat(account.getNumber().matches(String.format("%s \\d{4} \\d{4}", PreparerImpl.prefixOfAccountNumber)), is(true));
         assertThat(account.getId(), notNullValue());
     }
+
 
     private WebSocketStompClient getStompClient() {
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(createTransportClient()));
@@ -809,19 +810,5 @@ class AccountsControllerTest extends CommonApiTest {
         return Collections.singletonList(new WebSocketTransport(new StandardWebSocketClient()));
     }
 
-    private List<Account> getAccountsOfAdminUser(){
-        ResponseEntity<List<Account>> userAccountsEntity = authAdmin()
-                .restClientWithoutErrorHandler().exchange("/accounts/my", HttpMethod.GET, null, new ParameterizedTypeReference<List<Account>>() {});
-        List<Account> accounts = userAccountsEntity.getBody();
-        assert accounts!=null;
-        return accounts;
-    }
 
-
-    private ApplicationUser createUser(String userName){
-        ResponseEntity<ApplicationUser> userByAdmin = createUserByAdmin(userName);
-        ApplicationUser body = userByAdmin.getBody();
-        assert body!=null;
-        return body;
-    }
 }

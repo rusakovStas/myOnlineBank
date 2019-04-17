@@ -349,9 +349,6 @@ public class AccountTests extends CommonUITest {
         firstAccount
                 .editNameOfAccount(newName)
                 .execute();
-        firstAccount
-                .editNameOfAccount("Something")
-                .decline();
 
         firstAccount.accountNameShouldHave(value(newName));
     }

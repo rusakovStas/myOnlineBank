@@ -2,13 +2,18 @@ package integration.po;
 
 import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.Driver;
 import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.conditions.Text;
+import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.codeborne.selenide.CollectionCondition.size;
 import static com.codeborne.selenide.CollectionCondition.sizeGreaterThan;
+import static com.codeborne.selenide.CollectionCondition.texts;
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
@@ -23,11 +28,39 @@ public class AccountsPage {
         return $(byText("Add new account"));
     }
 
-    public void createNewAccount(){
-        int sizeBeforeCreation = getAccounts().size();
+    public Account createNewAccount(){
+        List<String> numbersOfAccountsBeforeCreation = getAccounts().stream()
+                .map(Account::getNumber)
+                .collect(Collectors.toList());
+
         $(byText("Add new account")).shouldBe(enabled).click();
-        $$(".account-item")
-                .shouldHave(size(sizeBeforeCreation + 1));
+
+        SelenideElement newAccountSelenide = $$(".account-item")
+                .exclude(new Contains("contains any texts", numbersOfAccountsBeforeCreation))
+                .shouldHave(size(1))
+                .get(0);
+        return new Account(newAccountSelenide);
+    }
+
+    class Contains extends Condition{
+        List<Text> textsCondition = new ArrayList<>();
+        Contains(String name, List<String> texts) {
+            super(name);
+            for (String text: texts){
+                textsCondition.add(new Text(text));
+            }
+
+        }
+
+        @Override
+        public boolean apply(Driver driver, WebElement element) {
+            for (Text text : textsCondition) {
+                if (text.apply(driver, element)){
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     private List<Account> getAccounts() {

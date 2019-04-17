@@ -337,5 +337,71 @@ public class AccountTests extends CommonUITest {
                 .checkThatSuggestionsNotHaveAccountTo("My ", number);
     }
 
+    @Test
+    void userCanRenameHisOwnAccount() {
+        String defaultUser = "user";
+        login(defaultUser, "pass");
+        $(byText("Accounts")).click();
+        AccountsPage accountsPage = new AccountsPage();
+        Account firstAccount = accountsPage.getAccountWithIndex(0);
+        String newName = "New Name";
 
+        firstAccount
+                .editNameOfAccount(newName)
+                .execute();
+        firstAccount
+                .editNameOfAccount("Something")
+                .decline();
+
+        firstAccount.accountNameShouldHave(value(newName));
+    }
+
+    @Test
+    void userCanNameNotNamedAccount() {
+        String defaultUser = "user";
+        login(defaultUser, "pass");
+        $(byText("Accounts")).click();
+        AccountsPage accountsPage = new AccountsPage();
+        String newName = "New name for new account";
+        Account newAccount = accountsPage.createNewAccount();
+
+        newAccount
+                .editNameOfAccount(newName)
+                .execute();
+
+        newAccount.accountNameShouldHave(value(newName));
+    }
+
+    @Test
+    void adminCanRenameHisOwnAccount() {
+        String adminName = "admin";
+
+        login(adminName, "pass");
+        $(byText("Accounts")).click();
+
+        AccountsPage accountsPage = new AccountsPage();
+
+        String newAdminAccountName = "New Admin account name";
+        Account firstAdminAccount = accountsPage
+                .getAccountsByUserName(adminName)
+                .get(0);
+        firstAdminAccount
+                .editNameOfAccount(newAdminAccountName)
+                .execute();
+        firstAdminAccount.accountNameShouldHave(value(newAdminAccountName));
+    }
+
+    @Test
+    void adminCanNotRenameNotHisOwnAccount() {
+        String adminName = "admin";
+        String defaultUser = "user";
+
+        login(adminName, "pass");
+        $(byText("Accounts")).click();
+
+        AccountsPage accountsPage = new AccountsPage();
+        accountsPage
+                .getAccountsByUserName(defaultUser)
+                .forEach(account -> account.editButtonShouldBe(not(enabled)));
+    }
 }

@@ -8,9 +8,7 @@ import java.util.Optional;
 
 import static com.codeborne.selenide.CollectionCondition.size;
 import static com.codeborne.selenide.CollectionCondition.sizeGreaterThan;
-import static com.codeborne.selenide.Condition.not;
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 
@@ -20,6 +18,7 @@ public class Account {
     private SelenideElement owner;
     private SelenideElement number;
     private SelenideElement editButton;
+    private SelenideElement editInput;
     private SelenideElement moneyAmount;
     private SelenideElement deleteButton;
     private SelenideElement acceptButton;
@@ -35,6 +34,7 @@ public class Account {
                 .orElseThrow(() -> new RuntimeException("Account item can't be null"));
         this.owner = accountItem.$("#card-owner");
         this.number = accountItem.$("#account-number");
+        this.editInput = accountItem.$("#accountName");
         this.editButton = accountItem.$("#updateButton");
         this.moneyAmount = accountItem.$("#money-in-the-account");
         this.deleteButton = accountItem.$(byText("Block"));
@@ -59,12 +59,28 @@ public class Account {
         return moneyAmount.getText();
     }
 
+    public String getAccountName(){
+        return editInput.shouldBe(disabled).getValue();
+    }
+
+    public void accountNameShouldHave(Condition condition){
+        this.editInput.shouldBe(disabled).shouldHave(condition);
+    }
+
     public String getNumber() {
         return number.getText();
     }
 
     public String getOwnerName() {
         return owner.getText().replace("Owner: ","");
+    }
+
+    public TerminalOperation editNameOfAccount(String newName){
+        number.scrollTo();
+        number.click();
+        editButton.scrollTo().shouldBe(enabled).click();
+        editInput.shouldBe(enabled).setValue(newName);
+        return new TerminalOperation();
     }
 
     public Transaction beginTransaction(){
@@ -78,6 +94,12 @@ public class Account {
         number.scrollTo();
         number.click();
         this.deleteButton.shouldBe(condition);
+    }
+
+    public void editButtonShouldBe(Condition condition){
+        number.scrollTo();
+        number.click();
+        this.editButton.scrollTo().shouldBe(condition);
     }
 
     public DeleteAccount beginDeleteAccount() {
@@ -158,18 +180,17 @@ public class Account {
             return new TerminalOperation();
         }
 
-
     }
 
       public class TerminalOperation {
         TerminalOperation() {}
 
         public void execute(){
-            acceptButton.click();
+            acceptButton.scrollTo().shouldBe(enabled).click();
         }
 
         public void decline(){
-            declineButton.click();
+            declineButton.scrollTo().shouldBe(enabled).click();
         }
 
     }

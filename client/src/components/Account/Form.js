@@ -5,15 +5,8 @@ import Account from "./Account";
 
 class AccountForm extends React.Component {
 	state = {
-		collapse: -1,
-		suggestions: []
+		collapse: -1
 	};
-
-	componentDidMount() {
-		this.props
-			.getSuggestions()
-			.then(res => this.setState({ suggestions: res }));
-	}
 
 	toggle = index => {
 		this.setState({
@@ -54,6 +47,7 @@ class AccountForm extends React.Component {
 									getSuggestions={this.props.getSuggestions}
 									transaction={this.props.transaction}
 									decline={this.props.decline}
+									edite={this.props.edite}
 								/>
 							</Col>
 						))}

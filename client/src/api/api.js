@@ -49,6 +49,10 @@ export default {
 		createAccount: account =>
 			axios
 				.post(`http://${BASE_URL}/accounts`, account)
+				.then(res => res.data),
+		editAccount: account =>
+			axios
+				.put(`http://${BASE_URL}/accounts`, account)
 				.then(res => res.data)
 	}
 };

@@ -6,8 +6,8 @@ import {
 	getAllAccounts,
 	getMyAccounts,
 	createAccount,
-	deleteAccount
-	// editeAccount,
+	deleteAccount,
+	editAccount
 } from "../../actions/accounts";
 import api from "../../api/api";
 
@@ -29,6 +29,7 @@ class AccountPage extends React.Component {
 				decline={this.props.deleteAccount}
 				currentUser={this.props.currentUser}
 				create={this.props.createAccount}
+				edite={this.props.editAccount}
 			/>
 		);
 	}
@@ -40,7 +41,7 @@ AccountPage.propTypes = {
 	getAllAccounts: PropTypes.func.isRequired,
 	getMyAccounts: PropTypes.func.isRequired,
 	createAccount: PropTypes.func.isRequired,
-	editeAccount: PropTypes.func.isRequired,
+	editAccount: PropTypes.func.isRequired,
 	deleteAccount: PropTypes.func.isRequired,
 	accounts: PropTypes.arrayOf.isRequired
 };
@@ -61,7 +62,7 @@ export default connect(
 		getAllAccounts,
 		createAccount,
 		deleteAccount,
-		getMyAccounts
-		// editeAccount,
+		getMyAccounts,
+		editAccount
 	}
 )(AccountPage);

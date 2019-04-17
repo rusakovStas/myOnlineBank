@@ -24,7 +24,8 @@ class Account extends React.Component {
 		loading: false,
 		chosen: [],
 		transactionData: {},
-		suggestions: []
+		suggestions: [],
+		accountData: {}
 	};
 
 	constructor(props) {
@@ -51,7 +52,7 @@ class Account extends React.Component {
 	};
 
 	toggleTransaction = () => {
-		// По хорошему нужно делать loading, но пока вроде нет проблем оставлю так
+		// По хорошему нужно делать какой нибудь хитрый loading, но пока вроде нет проблем оставлю так
 		this.props
 			.getSuggestions()
 			.then(res => this.setState({ suggestions: res }));
@@ -85,6 +86,9 @@ class Account extends React.Component {
 		}
 		if (this.state.edite) {
 			this.setState({
+				accountData: {}
+			});
+			this.setState({
 				confirm: false,
 				edite: false
 			});
@@ -110,10 +114,16 @@ class Account extends React.Component {
 			});
 		}
 		if (this.state.edite) {
-			this.setState({
-				confirm: false,
-				edite: false
-			});
+			this.setState({ loading: true });
+			this.props
+				.edite(this.state.accountData)
+				.then(() => this.setState({ loading: false, accountData: {} }))
+				.then(() =>
+					this.setState({
+						confirm: false,
+						edite: false
+					})
+				);
 		}
 		if (this.state.transaction) {
 			this.setState({ loading: true });
@@ -161,6 +171,14 @@ class Account extends React.Component {
 			}
 		});
 
+	onChangeAccountName = e =>
+		this.setState({
+			accountData: {
+				name: e.target.value ? e.target.value : "",
+				id: this.props.account.id
+			}
+		});
+
 	render() {
 		const { account, open, toggle, currentUser } = this.props;
 		const {
@@ -171,7 +189,8 @@ class Account extends React.Component {
 			loading,
 			chosen,
 			suggestions,
-			transaction
+			transaction,
+			accountData
 		} = this.state;
 		return (
 			<div>
@@ -179,10 +198,16 @@ class Account extends React.Component {
 					{(!!account.name || edite) && (
 						<CardTitle>
 							<input
-								value={account.name}
+								value={
+									this.state.edite === true
+										? accountData.name
+										: account.name
+								}
+								id="accountName"
 								disabled={this.state.edite === false}
 								ref={this.inputForName}
 								onFocus={this.handleFocus}
+								onChange={this.onChangeAccountName}
 								className="border-0 form-input form-control input-in-header text-white"
 							/>
 						</CardTitle>
@@ -289,6 +314,10 @@ class Account extends React.Component {
 											size="lg"
 											block
 											color="success"
+											disabled={
+												account.user.username !==
+												currentUser
+											}
 											onClick={this.toggleEdit}
 										>
 											{!!account.name ||

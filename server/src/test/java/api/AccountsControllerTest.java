@@ -293,7 +293,7 @@ class AccountsControllerTest extends CommonApiTest {
 
     @Test
     void userCanNotDoTransactionNotFromTheirAccounts() {
-        ApplicationUser userTo = createUser("notDefaultUser");
+        ApplicationUser userTo = createUser("newNotDefaultUser");
         Account accFrom = getAccountsOfDefaultUser().get(0);
         BigDecimal sumFromBefore = accFrom.getAmount().getSum();
         Account accTo = getAccountsOfCreatedUser(userTo.getUsername()).get(0);

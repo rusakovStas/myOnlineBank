@@ -61,3 +61,8 @@ export const createAccount = account => dispatch =>
 	api.account.createAccount(account).then(response => {
 		dispatch(addAccount(response));
 	});
+
+export const editAccount = account => dispatch =>
+	api.account.editAccount(account).then(response => {
+		dispatch(updateAccount(response));
+	});

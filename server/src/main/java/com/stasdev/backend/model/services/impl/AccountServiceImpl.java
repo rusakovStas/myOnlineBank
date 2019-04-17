@@ -85,8 +85,18 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account nameAccount(Account account){
-        return null;
+    @Transactional
+    public Account nameAccount(String currentUser, Account account){
+        Account one = accountRepository.getOne(account.getId());
+        ApplicationUser byUsername = userRepository.findByUsername(currentUser);
+        if (!one.getUser().getUsername().equals(currentUser)){
+            throw new ThereIsNoAccountsWithId(String.format("You don't has account with id %d", account.getId()));
+        }
+        one.setName(account.getName());
+        byUsername.getAccounts().remove(one);
+        byUsername.getAccounts().add(one);
+        userRepository.saveAndFlush(byUsername);
+        return accountRepository.saveAndFlush(one);
     }
 
     @Override

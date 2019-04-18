@@ -207,7 +207,7 @@ public class AccountTests extends CommonUITest {
     void adminCanDoTransactionToUser() {
         String adminName = "admin";
         String defaultUserName = "user";
-        String amountOfTransaction = "100000";
+        String amountOfTransaction = "9000000";
 
         login(adminName, "pass");
         $(byText("Accounts")).click();
@@ -400,5 +400,24 @@ public class AccountTests extends CommonUITest {
         accountsPage
                 .getAccountsByUserName(defaultUser)
                 .forEach(account -> account.editButtonShouldBe(not(enabled)));
+    }
+
+    @Test
+    void userCanNotSendMoneyMoreThanHeHaveOnAccount() {
+        String defaultUser = "user";
+        login(defaultUser, "pass");
+        $(byText("Accounts")).click();
+        AccountsPage accountsPage = new AccountsPage();
+        Account firstAccount = accountsPage.getAccountWithIndex(0);
+        Account secondAccount = accountsPage.getAccountWithIndex(1);
+        String amountOfAccount = firstAccount.getMoneyAmount();
+
+        firstAccount
+                .beginTransaction()
+                .chooseAccountToFromSuggestions(secondAccount)
+                .setAmountOfTransaction(amountOfAccount + "0")
+                .execute();
+
+        firstAccount.notEnoughMoneyErrorShoultBe(visible);
     }
 }

@@ -30,6 +30,7 @@ class AccountPage extends React.Component {
 				currentUser={this.props.currentUser}
 				create={this.props.createAccount}
 				edite={this.props.editAccount}
+				hasRoleAdmin={this.props.hasRoleAdmin}
 			/>
 		);
 	}

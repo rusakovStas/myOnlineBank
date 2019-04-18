@@ -26,6 +26,7 @@ public class Account {
     private SelenideElement warningMessage;
     private SelenideElement transactionInput;
     private SelenideElement transactionButton;
+    private SelenideElement notEnoughMoneyError;
     private SelenideElement transactionAmountInput;
     private ElementsCollection transactionSuggestions;
 
@@ -43,6 +44,7 @@ public class Account {
         this.warningMessage = accountItem.$(byText("Are you sure you want to block the account?"));
         this.transactionInput = accountItem.$(".transaction-input-test input:enabled");
         this.transactionButton = accountItem.$(byText("Transaction"));
+        this.notEnoughMoneyError = accountItem.$(byText("Not enough money in this account"));
         this.transactionAmountInput = accountItem.$("#amount");
         this.transactionSuggestions = accountItem.$$(".transaction-input-test li");
     }
@@ -73,6 +75,10 @@ public class Account {
 
     public String getOwnerName() {
         return owner.getText().replace("Owner: ","");
+    }
+
+    public void notEnoughMoneyErrorShoultBe(Condition condition){
+        this.notEnoughMoneyError.shouldBe(condition);
     }
 
     public TerminalOperation editNameOfAccount(String newName){

@@ -47,8 +47,12 @@ class Account extends React.Component {
 
 	validate = data => {
 		const errors = {};
-		if (Number(data.amount.sum) > Number(this.props.account.amount.sum))
+		if (
+			!this.props.hasRoleAdmin &&
+			Number(data.amount.sum) > Number(this.props.account.amount.sum)
+		)
 			errors.amount = "Not enough money in this account";
+
 		return errors;
 	};
 
@@ -408,6 +412,7 @@ class Account extends React.Component {
 }
 
 Account.propTypes = {
+	hasRoleAdmin: PropTypes.bool.isRequired,
 	currentUser: PropTypes.string.isRequired,
 	transaction: PropTypes.func.isRequired,
 	decline: PropTypes.func.isRequired,

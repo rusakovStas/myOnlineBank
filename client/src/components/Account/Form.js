@@ -48,6 +48,7 @@ class AccountForm extends React.Component {
 									transaction={this.props.transaction}
 									decline={this.props.decline}
 									edite={this.props.edite}
+									hasRoleAdmin={this.props.hasRoleAdmin}
 								/>
 							</Col>
 						))}
@@ -74,7 +75,8 @@ AccountForm.propTypes = {
 	create: PropTypes.func.isRequired,
 	accounts: PropTypes.arrayOf.isRequired,
 	getSuggestions: PropTypes.func.isRequired,
-	currentUser: PropTypes.string.isRequired
+	currentUser: PropTypes.string.isRequired,
+	hasRoleAdmin: PropTypes.bool.isRequired
 };
 
 export default AccountForm;

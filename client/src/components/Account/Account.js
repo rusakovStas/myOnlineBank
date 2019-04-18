@@ -13,6 +13,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Typeahead } from "react-bootstrap-typeahead";
 import FormButton from "../commons/FormButton";
+import InlineError from "../commons/InlineError";
 
 class Account extends React.Component {
 	state = {
@@ -25,7 +26,8 @@ class Account extends React.Component {
 		chosen: [],
 		transactionData: {},
 		suggestions: [],
-		accountData: {}
+		accountData: {},
+		errors: {}
 	};
 
 	constructor(props) {
@@ -42,6 +44,13 @@ class Account extends React.Component {
 			this.focus();
 		}
 	}
+
+	validate = data => {
+		const errors = {};
+		if (Number(data.amount.sum) > Number(this.props.account.amount.sum))
+			errors.amount = "Not enough money in this account";
+		return errors;
+	};
 
 	handleFocus = event => {
 		event.target.select();
@@ -107,6 +116,12 @@ class Account extends React.Component {
 			this.setState({ loading: true });
 			this.props
 				.decline(this.props.account.id)
+				.catch(err =>
+					this.setState({
+						loading: false,
+						errors: { global: err.response.data.message }
+					})
+				)
 				.then(() => this.setState({ loading: false }));
 			this.setState({
 				confirm: false,
@@ -117,6 +132,12 @@ class Account extends React.Component {
 			this.setState({ loading: true });
 			this.props
 				.edite(this.state.accountData)
+				.catch(err =>
+					this.setState({
+						loading: false,
+						errors: { global: err.response.data.message }
+					})
+				)
 				.then(() => this.setState({ loading: false, accountData: {} }))
 				.then(() =>
 					this.setState({
@@ -126,17 +147,27 @@ class Account extends React.Component {
 				);
 		}
 		if (this.state.transaction) {
-			this.setState({ loading: true });
-			this.props
-				.transaction(this.state.transactionData)
-				.then(() => this.setState({ loading: false }))
-				.then(() =>
-					this.setState({
-						confirm: false,
-						transaction: false,
-						openTransaction: false
-					})
-				);
+			const errors = this.validate(this.state.transactionData);
+			this.setState({ errors });
+			if (Object.keys(errors).length === 0) {
+				this.setState({ loading: true });
+				this.props
+					.transaction(this.state.transactionData)
+					.catch(err =>
+						this.setState({
+							loading: false,
+							errors: { global: err.response.data.message }
+						})
+					)
+					.then(() => this.setState({ loading: false }))
+					.then(() =>
+						this.setState({
+							confirm: false,
+							transaction: false,
+							openTransaction: false
+						})
+					);
+			}
 		}
 	};
 
@@ -190,11 +221,13 @@ class Account extends React.Component {
 			chosen,
 			suggestions,
 			transaction,
-			accountData
+			accountData,
+			errors
 		} = this.state;
 		return (
 			<div>
 				<Card className="text-center account-item p-2 text-white grow-on-hover shadow">
+					{errors.global && <InlineError text={errors.global} />}
 					{(!!account.name || edite) && (
 						<CardTitle>
 							<input
@@ -280,7 +313,11 @@ class Account extends React.Component {
 									value={transaction.amount}
 									onChange={this.onChangeAmount}
 									disabled={loading}
+									invalid={!!errors.amount}
 								/>
+								{errors.amount && (
+									<InlineError text={errors.amount} />
+								)}
 							</CardText>
 						</Collapse>
 						<Collapse isOpen={block}>

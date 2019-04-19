@@ -415,4 +415,17 @@ public class AccountTests extends CommonUITest {
 
         firstAccount.notEnoughMoneyErrorShoultBe(visible);
     }
+
+    @Test
+    void userNotSeeHisOwnAccountInSuggestions() {
+        String defaultUser = "user";
+        login(defaultUser, "pass");
+        $(byText("Accounts")).click();
+        AccountsPage accountsPage = new AccountsPage();
+        Account firstAccount = accountsPage.getAccountWithIndex(0);
+
+        firstAccount
+                .beginTransaction()
+                .checkThatSuggestionsNotHaveAccountTo("My ", firstAccount.getNumber());
+    }
 }

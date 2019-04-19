@@ -228,6 +228,16 @@ public abstract class ApiFunctions {
         return suggestions;
     }
 
+    protected List<Suggestion> getSuggestionsToDefaultUserWithExclude(Long excludeId){
+        ResponseEntity<List<Suggestion>> suggestionsEntity = authUser()
+                .restClientWithoutErrorHandler()
+                .exchange("/accounts/suggestions?excludeAccountId=" + excludeId, HttpMethod.GET,null, new ParameterizedTypeReference<List<Suggestion>>(){});
+
+        List<Suggestion> suggestions = suggestionsEntity.getBody();
+        assert suggestions != null;
+        return suggestions;
+    }
+
     protected List<Suggestion> getSuggestionsToCreatedUser(String user){
         ResponseEntity<List<Suggestion>> suggestionsEntity = authByUser(user,DEFAULT_PASSWORD)
                 .restClientWithoutErrorHandler()

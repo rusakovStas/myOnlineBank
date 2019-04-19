@@ -12,7 +12,7 @@ public interface AccountService {
 
     List<Account> getMyAccount(String name);
 
-    List<Suggestion> getSuggestions(String currentUser);
+    List<Suggestion> getSuggestions(String currentUser, Long id);
 
     Account createAccount(Account account);
 

@@ -52,8 +52,8 @@ public class Accounts {
         accountService.transaction(transaction, name);
     }
 
-    @GetMapping("/suggestions")
-    List<Suggestion> getSuggestion(Authentication authentication){
-        return accountService.getSuggestions(authentication.getName());
+    @GetMapping(value = "/suggestions")
+    List<Suggestion> getSuggestion(Authentication authentication, @RequestParam(required = false) Long excludeAccountId){
+        return accountService.getSuggestions(authentication.getName(), excludeAccountId);
     }
 }

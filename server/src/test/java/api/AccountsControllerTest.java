@@ -34,6 +34,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /*
@@ -680,6 +682,37 @@ class AccountsControllerTest extends CommonApiTest {
         assertThat(my_own_accounts.size(), is(maskAccounts.size()));
     }
 
+    @Test
+    void userCanGetSuggestionsWithExcludeAccount() {
+        List<Account> allAccountsByAdmin = getAllAccountsByAdmin();
+        List<Account> accountsOfDefaultUser = getAccountsOfDefaultUser();
+        Long excludeId = accountsOfDefaultUser.get(0).getId();
+        List<Suggestion> suggestionsToDefaultUser = getSuggestionsToDefaultUserWithExclude(excludeId);
+        /*Проверить что все suggestion - равны количеству счетов минус тот который решили отфильтровать*/
+        assertThat(suggestionsToDefaultUser.size(), is(allAccountsByAdmin.size() - 1));
+        /*Проверить что среди suggestion - нет счета с id который мы исключили*/
+        assertFalse(suggestionsToDefaultUser.stream().anyMatch(s -> s.getAccountId().equals(excludeId)));
+
+        /*Проверить что счета замаскированы*/
+        int count = ((int) suggestionsToDefaultUser
+                .stream()
+                .filter(s -> s.getMaskAccountNumber().matches("\\*\\*\\* \\d{4}"))
+                .count());
+        assertThat("Не все счета замаскированы", count, is(suggestionsToDefaultUser.size()));
+        /*Проверить что имя юзера который делает запрос заменено на My own account*/
+        List<String> my_own_accounts = suggestionsToDefaultUser
+                .stream()
+                .filter(s -> s.getUserName().equals("My own account"))
+                .map(Suggestion::getMaskAccountNumber)
+                .collect(Collectors.toList());
+        List<String> maskAccounts = getAccountsOfDefaultUser()
+                .stream()
+                .map(Account::getNumber)
+                .map(n -> "*** " + n.split(" ")[3])
+                .filter(my_own_accounts::contains)
+                .collect(Collectors.toList());
+        assertThat(my_own_accounts.size(), is(maskAccounts.size()));
+    }
 
     @Test
     void whenDeletedUserAllHisAccountsDeletedToo() {

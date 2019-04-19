@@ -34,9 +34,6 @@ class Account extends React.Component {
 		super(props);
 		// create a ref to store the button DOM element
 		this.inputForName = React.createRef();
-		this.props
-			.getSuggestions()
-			.then(res => this.setState({ suggestions: res }));
 	}
 
 	componentDidUpdate(prevProps, prevState) {
@@ -67,7 +64,7 @@ class Account extends React.Component {
 	toggleTransaction = () => {
 		// По хорошему нужно делать какой нибудь хитрый loading, но пока вроде нет проблем оставлю так
 		this.props
-			.getSuggestions()
+			.getSuggestions(this.props.account.id)
 			.then(res => this.setState({ suggestions: res }));
 		this.setState({
 			transaction: true,

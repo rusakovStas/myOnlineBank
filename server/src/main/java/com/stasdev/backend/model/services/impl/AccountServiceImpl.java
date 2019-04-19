@@ -52,11 +52,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<Suggestion> getSuggestions(String currentUser){
+    public List<Suggestion> getSuggestions(String currentUser, Long excludeId){
         return userRepository
                 .findAll()
                 .stream()
                 .flatMap(u -> u.getAccounts().stream()) //разворачиваем все аккаунты этих юзеров в один стрим
+                .filter(a -> !a.getId().equals(excludeId))
                 .map(a -> new Pair<>(currentUser, a))
                 .map(this::mapAccountToSuggestion) //создаем из информации об аккаунтах предположения
                 .collect(Collectors.toList()); //их и отдаем

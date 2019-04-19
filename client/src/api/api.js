@@ -40,9 +40,11 @@ export default {
 			axios.get(`http://${BASE_URL}/accounts/my`).then(res => res.data),
 		deleteAccount: accountId =>
 			axios.delete(`http://${BASE_URL}/accounts/?id=${accountId}`),
-		getSuggestions: () =>
+		getSuggestions: accountId =>
 			axios
-				.get(`http://${BASE_URL}/accounts/suggestions`)
+				.get(
+					`http://${BASE_URL}/accounts/suggestions?excludeAccountId=${accountId}`
+				)
 				.then(res => res.data),
 		createTransaction: transaction =>
 			axios.post(`http://${BASE_URL}/accounts/transaction`, transaction),

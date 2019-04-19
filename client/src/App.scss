@@ -71,7 +71,7 @@ $alert-border-radius: 0px !default;
 
 .shadow {
   background: #e8e8e8; /* Цвет фона */
-  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 }
 
 .grow-or-fall {
@@ -103,6 +103,7 @@ $alert-border-radius: 0px !default;
 }
 
 section {
+  overflow-x: hidden;
   width: 100%;
   max-width: none;
   text-align: center;
@@ -112,9 +113,7 @@ section {
 }
 
 .account-item {
-background: linear-gradient(to right, #5B86E5, #36D1DC);
-
-
+  background: linear-gradient(to right, #5b86e5, #36d1dc);
 
   /*background: linear-gradient(to bottom right, $gray-800, $gray-900) !important;*/
   /*Cover with cat*/
@@ -162,16 +161,13 @@ background: linear-gradient(to right, #5B86E5, #36D1DC);
 /* Делаем отступ снизу что бы зафиксированная кнопка влезала */
 body {
   padding-bottom: 5rem;
-
 }
 
 /*Test markers*/
-.transaction-input-test{
-
+.transaction-input-test {
 }
 
-.money-in-the-account{
-
+.money-in-the-account {
 }
 
 @import "bootstrap/scss/bootstrap.scss";

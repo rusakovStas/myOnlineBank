@@ -304,15 +304,10 @@ public class AccountTests extends CommonUITest {
         login(adminName, "pass");
         $(byText("Accounts")).click();
         AccountsPage accountsPage = new AccountsPage();
-        int sizeBeforeCreation = getAllAccountsByAdmin()
-                .stream()
-                .filter(a -> a.getUser().getUsername().equals(adminName))
-                .collect(Collectors.toList())
-                .size();
 
-        accountsPage.createNewAccount();
+        Account newAccount = accountsPage.createNewAccount();
 
-        accountsPage.accountsOfUserShouldHave(adminName, size(sizeBeforeCreation + 1));
+        newAccount.accountNameShouldHave(not(exist));
     }
 
     @Test

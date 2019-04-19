@@ -93,7 +93,7 @@ public class AccountsPage {
     public void accountsOfUserShouldHave(String userName, CollectionCondition condition){
         $$(".account-item")
                 .shouldHave(sizeGreaterThan(0))
-                .exclude(not(text(userName)))
+                .exclude(not(text("Owner: "+ userName)))
                 .shouldHave(condition);
     }
 

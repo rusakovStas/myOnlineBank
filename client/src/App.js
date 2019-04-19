@@ -2,7 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faArrowDown, faRubleSign } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowDown,
+  faRubleSign,
+  faInfinity
+} from "@fortawesome/free-solid-svg-icons";
+import ReduxToastr from "react-redux-toastr";
 import HomePage from "./components/Home/Page";
 import LoginPage from "./components/Login/Page";
 import UserPage from "./components/User/Page";
@@ -11,9 +16,8 @@ import AdminRoute from "./components/commons/AdminRoute";
 import UserRoute from "./components/commons/UserRoute";
 import TopNavigationBar from "./components/commons/TopNavigationBar";
 import AccountPage from "./components/Account/Page";
-import ReduxToastr from "react-redux-toastr";
 
-library.add(faArrowDown, faRubleSign);
+library.add(faArrowDown, faRubleSign, faInfinity);
 
 const App = ({ location, isAuthentifacated }) => (
   <div>

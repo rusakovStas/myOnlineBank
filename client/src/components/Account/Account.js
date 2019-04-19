@@ -215,7 +215,7 @@ class Account extends React.Component {
 		});
 
 	render() {
-		const { account, open, toggle, currentUser } = this.props;
+		const { account, open, toggle, currentUser, hasRoleAdmin } = this.props;
 		const {
 			openTransaction,
 			confirm,
@@ -256,7 +256,15 @@ class Account extends React.Component {
 									className="text-monospace"
 									id="money-in-the-account"
 								>
-									{account.amount.sum}
+									{hasRoleAdmin &&
+									currentUser === account.user.username ? (
+										<FontAwesomeIcon
+											icon="infinity"
+											size="2x"
+										/>
+									) : (
+										account.amount.sum
+									)}
 									<FontAwesomeIcon
 										icon="ruble-sign"
 										size="1x"

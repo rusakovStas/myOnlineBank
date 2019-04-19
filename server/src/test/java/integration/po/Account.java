@@ -66,7 +66,7 @@ public class Account {
     }
 
     public void accountNameShouldHave(Condition condition){
-        this.editInput.shouldBe(disabled).shouldHave(condition);
+        this.editInput.shouldHave(condition);
     }
 
     public String getNumber() {

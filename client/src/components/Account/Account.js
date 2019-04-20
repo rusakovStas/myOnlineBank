@@ -172,15 +172,23 @@ class Account extends React.Component {
 		}
 	};
 
+	evalUserTo = userNameFromSuggestion => {
+		if (this.props.hasRoleAdmin) {
+			return userNameFromSuggestion === "My own account"
+				? this.props.currentUser
+				: userNameFromSuggestion;
+		}
+		return userNameFromSuggestion === "My own account"
+			? this.props.account.user.username
+			: userNameFromSuggestion;
+	};
+
 	handleOptionSelected = option => {
 		if (option.length >= 1) {
 			this.setState({
 				transactionData: {
 					...this.state.transactionData,
-					userTo:
-						option[0].userName === "My own account"
-							? this.props.account.user.username
-							: option[0].userName,
+					userTo: this.evalUserTo(option[0].userName),
 					accountNumberTo: option[0].maskAccountNumber,
 					accountIdTo: option[0].accountId,
 					userFrom: this.props.account.user.username,

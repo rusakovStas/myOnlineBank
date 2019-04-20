@@ -468,6 +468,32 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
+    void adminCanSendMoneyToHimselfByAnotherUser() {
+        BigDecimal amountOfTransh = new BigDecimal(new BigInteger("10"));
+        Account firstAccountOfDefaultUser = getAccountsOfDefaultUser().get(0);
+        Account firstAccountOfAdmin = getAccountsOfAdminUser().get(0);
+
+        Transaction transaction = new Transaction();
+        transaction.setAccountIdFrom(firstAccountOfDefaultUser.getId());
+        transaction.setAccountNumberFrom(firstAccountOfDefaultUser.getNumber());
+        transaction.setAmount(new Amount("RUR", amountOfTransh));
+        transaction.setUserFrom(firstAccountOfDefaultUser.getUser().getUsername());
+
+        transaction.setAccountIdTo(firstAccountOfAdmin.getId());
+        transaction.setAccountNumberTo(firstAccountOfAdmin.getNumber());
+        transaction.setUserTo(firstAccountOfAdmin.getUser().getUsername());
+
+        authAdmin().restClientWithoutErrorHandler().postForEntity("/accounts/transaction", transaction, String.class);
+
+        Account afterFrom = getAccountsOfDefaultUser().get(0);
+        Account afterTo = getAccountsOfAdminUser().get(0);
+
+        assertThat(firstAccountOfDefaultUser.getAmount().getSum().subtract(amountOfTransh), equalTo(afterFrom.getAmount().getSum()));
+        /*TODO подумать над проверкой суммы админа - смысла в ней нет*/
+        assertThat(firstAccountOfAdmin.getAmount().getSum().add(amountOfTransh), equalTo(afterTo.getAmount().getSum()));
+    }
+
+    @Test
     void adminCanDoTransactionFromHisOwnAccounts() throws InterruptedException, ExecutionException, TimeoutException {
         StompSession stompSession = getStompClient()
                 .connect(socketURL, new StompSessionHandlerAdapter() {}).get(1, SECONDS);

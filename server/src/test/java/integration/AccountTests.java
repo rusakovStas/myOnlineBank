@@ -428,4 +428,31 @@ public class AccountTests extends CommonUITest {
                 .beginTransaction()
                 .checkThatSuggestionsNotHaveAccountTo("My ", firstAccount.getNumber());
     }
+
+    @Test
+    void adminCanSendMoneyToHimselfByAnotherUser() {
+        String adminName = "admin";
+        String defaultUser = "user";
+        String amount = "100";
+
+        login(adminName, "pass");
+        $(byText("Accounts")).click();
+        AccountsPage accountsPage = new AccountsPage();
+        Account firstAccountOfDefaultUser = accountsPage.getAccountsByUserName(defaultUser).get(0);
+        Account adminAccount = accountsPage.getAccountsByUserName(adminName).get(0);
+        String moneyAccountFromBeforeTransaction = firstAccountOfDefaultUser.getMoneyAmount();
+        String expectedMoneyInTheAccountFromAfterTransaction = new BigDecimal(moneyAccountFromBeforeTransaction)
+                .subtract(new BigDecimal(amount))
+                .toPlainString();
+
+        firstAccountOfDefaultUser
+                .beginTransaction()
+                .chooseAccountToFromSuggestionsByAdmin(adminName, adminAccount)
+                .setAmountOfTransaction(amount)
+                .execute();
+
+        Account firstAccountOfDefaultUserAfter = accountsPage.getAccountsByUserName(defaultUser).get(0);
+        firstAccountOfDefaultUserAfter.accountMoneyShouldHave(text(expectedMoneyInTheAccountFromAfterTransaction));
+        accountsPage.checkPushAboutTransactionToOwnAccountAndCloseThem(defaultUser);
+    }
 }

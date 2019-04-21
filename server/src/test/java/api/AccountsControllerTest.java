@@ -617,6 +617,50 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
+    void userCanNotSendTransactionWithNegativeAmount() {
+        BigDecimal amountOfTransh = new BigDecimal(new BigInteger("-10"));
+        Account firstAccountOfDefaultUser = getAccountsOfDefaultUser().get(0);
+        Account firstAccountOfAdmin = getAccountsOfAdminUser().get(0);
+
+        Transaction transaction = new Transaction();
+        transaction.setAccountIdFrom(firstAccountOfDefaultUser.getId());
+        transaction.setAccountNumberFrom(firstAccountOfDefaultUser.getNumber());
+        transaction.setAmount(new Amount("RUR", amountOfTransh));
+        transaction.setUserFrom(firstAccountOfDefaultUser.getUser().getUsername());
+
+        transaction.setAccountIdTo(firstAccountOfAdmin.getId());
+        transaction.setAccountNumberTo(firstAccountOfAdmin.getNumber());
+        transaction.setUserTo(firstAccountOfAdmin.getUser().getUsername());
+
+        RuntimeException runtimeException = assertThrows(RuntimeException.class,
+                () -> authUser()
+                        .restClientWithErrorHandler().postForEntity("/accounts/transaction", transaction, String.class));
+        assertThat(runtimeException.getMessage(), containsString("You can't do transaction with negative amount"));
+    }
+
+    @Test
+    void userCanNotSendTransactionWithAmountWithScaleMoreThenTwo() {
+        BigDecimal amountOfTransh = new BigDecimal("10.111");
+        Account firstAccountOfDefaultUser = getAccountsOfDefaultUser().get(0);
+        Account firstAccountOfAdmin = getAccountsOfAdminUser().get(0);
+
+        Transaction transaction = new Transaction();
+        transaction.setAccountIdFrom(firstAccountOfDefaultUser.getId());
+        transaction.setAccountNumberFrom(firstAccountOfDefaultUser.getNumber());
+        transaction.setAmount(new Amount("RUR", amountOfTransh));
+        transaction.setUserFrom(firstAccountOfDefaultUser.getUser().getUsername());
+
+        transaction.setAccountIdTo(firstAccountOfAdmin.getId());
+        transaction.setAccountNumberTo(firstAccountOfAdmin.getNumber());
+        transaction.setUserTo(firstAccountOfAdmin.getUser().getUsername());
+
+        RuntimeException runtimeException = assertThrows(RuntimeException.class,
+                () -> authUser()
+                        .restClientWithErrorHandler().postForEntity("/accounts/transaction", transaction, String.class));
+        assertThat(runtimeException.getMessage(), containsString("Amount of transaction must to have scale no more than 2"));
+    }
+
+    @Test
     void userCanNotDeleteAccountsAnotherUsers() {
         ApplicationUser userForCheckAccountDeleting = createUser("UserForCheckForbiddenDeletingAccAnotherUser");
         List<Account> accountsOfDefaultUser = getAccountsOfDefaultUser();

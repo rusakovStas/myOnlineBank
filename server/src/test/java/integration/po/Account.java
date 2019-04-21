@@ -58,7 +58,7 @@ public class Account {
     }
 
     public String getMoneyAmount() {
-        return moneyAmount.getText();
+        return moneyAmount.getText().replace(" ", "");
     }
 
     public String getAccountName(){
@@ -184,6 +184,15 @@ public class Account {
         public TerminalOperation setAmountOfTransaction(String amount){
             transactionAmountInput.setValue(amount);
             return new TerminalOperation();
+        }
+
+        public Transaction setAmountOfTransactionToCheck(String amount){
+            transactionAmountInput.setValue(amount);
+            return new Transaction();
+        }
+
+        public void checkAmountOfTransaction(String expectedValue){
+            transactionAmountInput.shouldHave(value(expectedValue));
         }
 
     }

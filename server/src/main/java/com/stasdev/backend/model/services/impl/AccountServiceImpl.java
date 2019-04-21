@@ -9,6 +9,7 @@ import com.stasdev.backend.model.repos.TransactionRepository;
 import com.stasdev.backend.model.services.AccountService;
 import com.stasdev.backend.model.services.Preparer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -116,10 +117,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public synchronized void transaction(Transaction transaction,final String userName){
+    public synchronized void transaction(Transaction transaction, final String userName){
         transaction.setStartDateTime(LocalDateTime.now());
         Role admin = roleRepository.findByRole("admin").orElseThrow(() -> new RuntimeException("Not have role admin"));
         try {
+            Amount amount = transaction.getAmount();
+            validateAmount(amount);
 
             ApplicationUser userFrom = getApplicationUserWithCheck(transaction.getUserFrom());
             ApplicationUser userTo = getApplicationUserWithCheck(transaction.getUserTo());
@@ -136,7 +139,6 @@ public class AccountServiceImpl implements AccountService {
 
             boolean accountFromBelongsToCurrentUser = currentUser.getAccounts().contains(accountFrom);
 
-            Amount amount = transaction.getAmount();
             Amount amountFrom = accountFrom.getAmount();
             Amount amountTo = accountTo.getAmount();
             if (!currentUserHasRoleAdmin && amountFrom.compareTo(amount) < 0) {
@@ -162,6 +164,16 @@ public class AccountServiceImpl implements AccountService {
             transactionRepository.save(transaction);
         }
 
+    }
+
+    void validateAmount(Amount amount){
+        BigDecimal sum = amount.getSum();
+        if (sum.compareTo(BigDecimal.ZERO) < 0){
+            throw new RuntimeException("You can't do transaction with negative amount");
+        }
+        if (sum.scale() > 2) {
+            throw new RuntimeException("Amount of transaction must to have scale no more than 2");
+        }
     }
 
     ApplicationUser getApplicationUserWithCheck(String user) {

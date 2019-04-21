@@ -12,6 +12,7 @@ import {
 } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Typeahead } from "react-bootstrap-typeahead";
+import NumberFormat from "react-number-format";
 import FormButton from "../commons/FormButton";
 import InlineError from "../commons/InlineError";
 
@@ -24,7 +25,11 @@ class Account extends React.Component {
 		block: false,
 		loading: false,
 		chosen: [],
-		transactionData: {},
+		transactionData: {
+			amount: { sum: null },
+			userTo: null,
+			accountIdTo: null
+		},
 		suggestions: [],
 		accountData: {},
 		errors: {}
@@ -49,6 +54,10 @@ class Account extends React.Component {
 			Number(data.amount.sum) > Number(this.props.account.amount.sum)
 		)
 			errors.amount = "Not enough money in this account";
+
+		if (data.userTo === null || data.accountIdTo === null) {
+			errors.destination = "You must choose destination of transaction";
+		}
 
 		return errors;
 	};
@@ -123,11 +132,13 @@ class Account extends React.Component {
 						errors: { global: err.response.data.message }
 					})
 				)
-				.then(() => this.setState({ loading: false }));
-			this.setState({
-				confirm: false,
-				block: false
-			});
+				.finally(() =>
+					this.setState({
+						loading: false,
+						confirm: false,
+						block: false
+					})
+				);
 		}
 		if (this.state.edite) {
 			this.setState({ loading: true });
@@ -135,13 +146,13 @@ class Account extends React.Component {
 				.edite(this.state.accountData)
 				.catch(err =>
 					this.setState({
-						loading: false,
 						errors: { global: err.response.data.message }
 					})
 				)
-				.then(() => this.setState({ loading: false, accountData: {} }))
-				.then(() =>
+				.finally(() =>
 					this.setState({
+						loading: false,
+						accountData: {},
 						confirm: false,
 						edite: false
 					})
@@ -156,13 +167,18 @@ class Account extends React.Component {
 					.transaction(this.state.transactionData)
 					.catch(err =>
 						this.setState({
-							loading: false,
 							errors: { global: err.response.data.message }
 						})
 					)
-					.then(() => this.setState({ loading: false }))
-					.then(() =>
+					.finally(() =>
 						this.setState({
+							loading: false,
+							transactionData: {
+								amount: { sum: null },
+								userTo: null,
+								accountIdTo: null
+							},
+							chosen: [],
 							confirm: false,
 							transaction: false,
 							openTransaction: false
@@ -200,16 +216,17 @@ class Account extends React.Component {
 		}
 	};
 
-	onChangeAmount = e =>
+	onChangeAmount = values => {
 		this.setState({
 			transactionData: {
 				...this.state.transactionData,
 				amount: {
-					sum: e.target.value,
+					sum: values.value,
 					currency: this.props.account.amount.currency
 				}
 			}
 		});
+	};
 
 	onChangeAccountName = e =>
 		this.setState({
@@ -229,7 +246,7 @@ class Account extends React.Component {
 			loading,
 			chosen,
 			suggestions,
-			transaction,
+			transactionData,
 			accountData,
 			errors
 		} = this.state;
@@ -268,7 +285,11 @@ class Account extends React.Component {
 											size="2x"
 										/>
 									) : (
-										account.amount.sum
+										<NumberFormat
+											value={account.amount.sum}
+											displayType="text"
+											thousandSeparator=" "
+										/>
 									)}
 									<FontAwesomeIcon
 										icon="ruble-sign"
@@ -319,16 +340,23 @@ class Account extends React.Component {
 									onChange={this.handleOptionSelected}
 									selected={chosen}
 								/>
-								<Input
+								{errors.destination && (
+									<InlineError text={errors.destination} />
+								)}
+								<NumberFormat
+									customInput={Input}
+									decimalScale={2}
+									allowNegative={false}
+									thousandSeparator=" "
 									placeholder="Type amount..."
-									type="number"
 									validate
 									error="wrong"
 									success="right"
 									id="amount"
 									name="amount"
-									value={transaction.amount}
-									onChange={this.onChangeAmount}
+									selectAllOnFocus
+									value={transactionData.amount.sum}
+									onValueChange={this.onChangeAmount}
 									disabled={loading}
 									invalid={!!errors.amount}
 								/>

@@ -1,15 +1,16 @@
 package integration;
 
 import com.codeborne.selenide.*;
-import com.stasdev.backend.errors.NotImplementedYet;
 import common.TestProperties;
 import integration.po.Account;
 import integration.po.AccountsPage;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static com.codeborne.selenide.CollectionCondition.*;
@@ -22,6 +23,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 
 public class AccountTests extends CommonUITest {
+
+    private DecimalFormat decimalFormatter = new DecimalFormat("#,###.##", new DecimalFormatSymbols(new Locale("ru", "RU")));;
 
     void login(String userName, String pass) {
         int appPort = TestProperties.getInstance().getAppPort();
@@ -72,9 +75,8 @@ public class AccountTests extends CommonUITest {
         AccountsPage accountsPage = new AccountsPage();
         Account firstAccount = accountsPage.getAccountWithIndex(0);
         String moneyInTheAmountBeforeTransaction = firstAccount.getMoneyAmount();
-        String expectedMoneyInTheAccountAfterTransaction = new BigDecimal(moneyInTheAmountBeforeTransaction)
-                .subtract(new BigDecimal(amountOfTransaction))
-                .toPlainString();
+        String expectedMoneyInTheAccountAfterTransaction = decimalFormatter.format(new BigDecimal(moneyInTheAmountBeforeTransaction)
+                .subtract(new BigDecimal(amountOfTransaction)));
 
         firstAccount
                 .beginTransaction()
@@ -102,13 +104,11 @@ public class AccountTests extends CommonUITest {
         String moneyAccountFromBeforeTransaction = accountFrom.getMoneyAmount();
         String moneyAccountToBeforeTransaction = accountTo.getMoneyAmount();
 
-        String expectedMoneyInTheAccountFromAfterTransaction = new BigDecimal(moneyAccountFromBeforeTransaction)
-                .subtract(new BigDecimal(amountOfTransaction))
-                .toPlainString();
+        String expectedMoneyInTheAccountFromAfterTransaction = decimalFormatter.format(new BigDecimal(moneyAccountFromBeforeTransaction)
+                .subtract(new BigDecimal(amountOfTransaction)));
 
-        String expectedMoneyInTheAccountToAfterTransaction = new BigDecimal(moneyAccountToBeforeTransaction)
-                .add(new BigDecimal(amountOfTransaction))
-                .toPlainString();
+        String expectedMoneyInTheAccountToAfterTransaction = decimalFormatter.format(new BigDecimal(moneyAccountToBeforeTransaction)
+                .add(new BigDecimal(amountOfTransaction)));
 
         accountFrom
                 .beginTransaction()
@@ -134,15 +134,17 @@ public class AccountTests extends CommonUITest {
         AccountsPage accountsPage = new AccountsPage();
         Account firstAccount = accountsPage.getAccountWithIndex(0);
         String moneyAccountToBeforeTransaction = firstAccount.getMoneyAmount();
-        String expectedMoneyInTheAccountToAfterTransaction = new BigDecimal(moneyAccountToBeforeTransaction)
-                .add(new BigDecimal(amountOfTransaction))
-                .toPlainString();
+
+        String expectedMoneyInTheAccountToAfterTransaction = decimalFormatter.format(new BigDecimal(moneyAccountToBeforeTransaction)
+                .add(new BigDecimal(amountOfTransaction)));
 
         doTransactionByCreatedUserToFirstAccount(anotherUserName, defaultUser, amountOfTransaction);
 
         firstAccount.accountMoneyShouldHave(text(expectedMoneyInTheAccountToAfterTransaction));
         accountsPage.checkPushAboutTransactionFromAnotherUserAndCloseThem(anotherUserName);
     }
+
+
 
     @Test
     void userGetMessageAboutTransactionExecutedByAdminUnderHim() {
@@ -157,9 +159,8 @@ public class AccountTests extends CommonUITest {
         AccountsPage accountsPage = new AccountsPage();
         Account firstAccount = accountsPage.getAccountWithIndex(0);
         String moneyAccountToBeforeTransaction = firstAccount.getMoneyAmount();
-        String expectedMoneyInTheAccountToAfterTransaction = new BigDecimal(moneyAccountToBeforeTransaction)
-                .subtract(new BigDecimal(amountOfTransaction))
-                .toPlainString();
+        String expectedMoneyInTheAccountToAfterTransaction = decimalFormatter.format(new BigDecimal(moneyAccountToBeforeTransaction)
+                .subtract(new BigDecimal(amountOfTransaction)));
 
         doTransactionByAdminToFirstAccount(defaultUser, anotherUserName, amountOfTransaction);
 
@@ -184,13 +185,11 @@ public class AccountTests extends CommonUITest {
         String moneyAccountFromBeforeTransaction = accountFrom.getMoneyAmount();
         String moneyAccountToBeforeTransaction = accountTo.getMoneyAmount();
 
-        String expectedMoneyInTheAccountFromAfterTransaction = new BigDecimal(moneyAccountFromBeforeTransaction)
-                .subtract(new BigDecimal(amountOfTransaction))
-                .toPlainString();
+        String expectedMoneyInTheAccountFromAfterTransaction = decimalFormatter.format(new BigDecimal(moneyAccountFromBeforeTransaction)
+                .subtract(new BigDecimal(amountOfTransaction)));
 
-        String expectedMoneyInTheAccountToAfterTransaction = new BigDecimal(moneyAccountToBeforeTransaction)
-                .add(new BigDecimal(amountOfTransaction))
-                .toPlainString();
+        String expectedMoneyInTheAccountToAfterTransaction = decimalFormatter.format(new BigDecimal(moneyAccountToBeforeTransaction)
+                .add(new BigDecimal(amountOfTransaction)));
 
         accountFrom
                 .beginTransaction()
@@ -221,9 +220,8 @@ public class AccountTests extends CommonUITest {
         String moneyAccountFromBeforeTransaction = accountFrom.getMoneyAmount();
         String moneyAccountToBeforeTransaction = accountTo.getMoneyAmount();
 
-        String expectedMoneyInTheAccountToAfterTransaction = new BigDecimal(moneyAccountToBeforeTransaction)
-                .add(new BigDecimal(amountOfTransaction))
-                .toPlainString();
+        String expectedMoneyInTheAccountToAfterTransaction = decimalFormatter.format(new BigDecimal(moneyAccountToBeforeTransaction)
+                .add(new BigDecimal(amountOfTransaction)));
 
         accountFrom
                 .beginTransaction()
@@ -441,9 +439,8 @@ public class AccountTests extends CommonUITest {
         Account firstAccountOfDefaultUser = accountsPage.getAccountsByUserName(defaultUser).get(0);
         Account adminAccount = accountsPage.getAccountsByUserName(adminName).get(0);
         String moneyAccountFromBeforeTransaction = firstAccountOfDefaultUser.getMoneyAmount();
-        String expectedMoneyInTheAccountFromAfterTransaction = new BigDecimal(moneyAccountFromBeforeTransaction)
-                .subtract(new BigDecimal(amount))
-                .toPlainString();
+        String expectedMoneyInTheAccountFromAfterTransaction = decimalFormatter.format(new BigDecimal(moneyAccountFromBeforeTransaction)
+                .subtract(new BigDecimal(amount)));
 
         firstAccountOfDefaultUser
                 .beginTransaction()
@@ -454,5 +451,21 @@ public class AccountTests extends CommonUITest {
         Account firstAccountOfDefaultUserAfter = accountsPage.getAccountsByUserName(defaultUser).get(0);
         firstAccountOfDefaultUserAfter.accountMoneyShouldHave(text(expectedMoneyInTheAccountFromAfterTransaction));
         accountsPage.checkPushAboutTransactionToOwnAccountAndCloseThem(defaultUser);
+    }
+
+    @Test
+    void userCanNotTypeInvalidAmount() {
+        String defaultUser = "user";
+        login(defaultUser, "pass");
+        $(byText("Accounts")).click();
+        AccountsPage accountsPage = new AccountsPage();
+        Account firstAccount = accountsPage.getAccountWithIndex(0);
+        Account secondAccount = accountsPage.getAccountWithIndex(1);
+
+        firstAccount
+                .beginTransaction()
+                .chooseAccountToFromSuggestions(secondAccount)
+                .setAmountOfTransactionToCheck("-10000.111")
+                .checkAmountOfTransaction("10 000.11");
     }
 }

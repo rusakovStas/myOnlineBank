@@ -70,13 +70,15 @@ class HomePage extends React.Component {
 									md={{ size: 10, offset: 1 }}
 									className="mb-3"
 								>
-									<AccountForMan
-										currentUser="you"
-										account={this.state.account}
-										toggle={() => {}}
-										open={false}
-										hasRoleAdmin={false}
-									/>
+									<Container>
+										<AccountForMan
+											currentUser="you"
+											account={this.state.account}
+											toggle={() => {}}
+											open={false}
+											hasRoleAdmin={false}
+										/>
+									</Container>
 								</Col>
 							</Row>
 						</Container>
@@ -100,10 +102,10 @@ class HomePage extends React.Component {
 									md={{ size: 10, offset: 1 }}
 									className="mb-2 mt-2"
 								>
-									<h6>
+									<h5 className="mb-4">
 										Just click on him and you'll see all
 										what he can
-									</h6>
+									</h5>
 								</Col>
 
 								<Col
@@ -111,16 +113,18 @@ class HomePage extends React.Component {
 									md={{ size: 10, offset: 1 }}
 									className="mb-3"
 								>
-									<AccountForMan
-										currentUser="you"
-										account={this.state.account}
-										toggle={this.toggle}
-										open={this.state.open}
-										enableTransaction={false}
-										enableEdit={false}
-										enableBlock={false}
-										hasRoleAdmin={false}
-									/>
+									<Container>
+										<AccountForMan
+											currentUser="you"
+											account={this.state.account}
+											toggle={this.toggle}
+											open={this.state.open}
+											enableTransaction={false}
+											enableEdit={false}
+											enableBlock={false}
+											hasRoleAdmin={false}
+										/>
+									</Container>
 								</Col>
 							</Row>
 							{this.state.stepFirst && (
@@ -149,10 +153,10 @@ class HomePage extends React.Component {
 									md={{ size: 10, offset: 1 }}
 									className="mb-2 mt-2"
 								>
-									<h6>
+									<h5 className="mb-4">
 										Click on edit button to... edit your
 										account
-									</h6>
+									</h5>
 									<p>
 										Type new name of account and click on
 										Accept button to confirm your change
@@ -164,17 +168,19 @@ class HomePage extends React.Component {
 									md={{ size: 10, offset: 1 }}
 									className="mb-3"
 								>
-									<AccountForMan
-										currentUser="you"
-										account={this.state.account}
-										toggle={() => {}}
-										open
-										enableTransaction={false}
-										enableEdit
-										edit={this.edit}
-										enableBlock={false}
-										hasRoleAdmin={false}
-									/>
+									<Container>
+										<AccountForMan
+											currentUser="you"
+											account={this.state.account}
+											toggle={() => {}}
+											open
+											enableTransaction={false}
+											enableEdit
+											edit={this.edit}
+											enableBlock={false}
+											hasRoleAdmin={false}
+										/>
+									</Container>
 								</Col>
 							</Row>
 							{this.state.stepSecond && (
@@ -203,14 +209,16 @@ class HomePage extends React.Component {
 									md={{ size: 10, offset: 1 }}
 									className="mb-2 mt-2"
 								>
-									<h6>
+									<h5 className="mb-4">
 										Click on Transaction button to send some
 										money
-									</h6>
+									</h5>
 								</Col>
 								<Col md="4" className="mt-5">
 									<p className="text-lg-left">
-										1. Type user name, for example - Jhon
+										1. Type user name (for example - Jhon)
+										or 'My own account' if you want send
+										money to your another account
 									</p>
 									<p className="text-lg-left">
 										2. Type amount sum
@@ -220,16 +228,18 @@ class HomePage extends React.Component {
 									</p>
 								</Col>
 								<Col md="8">
-									<AccountForMan
-										currentUser="you"
-										account={this.state.account}
-										toggle={() => {}}
-										open
-										enableTransaction
-										enableEdit={false}
-										enableBlock={false}
-										hasRoleAdmin={false}
-									/>
+									<Container>
+										<AccountForMan
+											currentUser="you"
+											account={this.state.account}
+											toggle={() => {}}
+											open
+											enableTransaction
+											enableEdit={false}
+											enableBlock={false}
+											hasRoleAdmin={false}
+										/>
+									</Container>
 								</Col>
 							</Row>
 							{this.state.stepThird && (
@@ -277,16 +287,18 @@ class HomePage extends React.Component {
 									md={{ size: 10, offset: 1 }}
 									className="mb-3"
 								>
-									<AccountForMan
-										currentUser="you"
-										account={this.state.account}
-										toggle={this.toggle}
-										open
-										enableTransaction={false}
-										enableEdit={false}
-										enableBlock
-										hasRoleAdmin={false}
-									/>
+									<Container>
+										<AccountForMan
+											currentUser="you"
+											account={this.state.account}
+											toggle={this.toggle}
+											open
+											enableTransaction={false}
+											enableEdit={false}
+											enableBlock
+											hasRoleAdmin={false}
+										/>
+									</Container>
 								</Col>
 							</Row>
 						</Container>

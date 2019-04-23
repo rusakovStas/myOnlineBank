@@ -129,6 +129,7 @@ class AccountForMan extends React.Component {
 
 	accept = () => {
 		if (this.state.block) {
+			this.props.block();
 		}
 		if (this.state.edite) {
 			this.props.edit(this.state.accountData.name);
@@ -140,11 +141,74 @@ class AccountForMan extends React.Component {
 			});
 		}
 		if (this.state.transaction) {
+			const errors = this.validate(this.state.transactionData);
+			this.setState({ errors });
+			if (Object.keys(errors).length === 0) {
+				this.props.transaction(this.state.transactionData.amount.sum);
+				this.setState({
+					transactionData: {
+						amount: { sum: null },
+						userTo: null,
+						accountIdTo: null
+					},
+					chosen: [],
+					confirm: false,
+					transaction: false,
+					openTransaction: false
+				});
+			}
 		}
 	};
 
+	evalUserTo = userNameFromSuggestion => {
+		if (this.props.hasRoleAdmin) {
+			return userNameFromSuggestion === "My own account"
+				? this.props.currentUser
+				: userNameFromSuggestion;
+		}
+		return userNameFromSuggestion === "My own account"
+			? this.props.account.user.username
+			: userNameFromSuggestion;
+	};
+
+	handleOptionSelected = option => {
+		if (option.length >= 1) {
+			this.setState({
+				transactionData: {
+					...this.state.transactionData,
+					userTo: this.evalUserTo(option[0].userName),
+					accountNumberTo: option[0].maskAccountNumber,
+					accountIdTo: option[0].accountId,
+					userFrom: this.props.account.user.username,
+					accountNumberFrom: this.props.account.number,
+					accountIdFrom: this.props.account.id
+				},
+				chosen: option
+			});
+		}
+	};
+
+	onChangeAmount = values => {
+		this.setState({
+			transactionData: {
+				...this.state.transactionData,
+				amount: {
+					sum: values.value,
+					currency: this.props.account.amount.currency
+				}
+			}
+		});
+	};
+
 	render() {
-		const { account, open, currentUser, hasRoleAdmin, toggle } = this.props;
+		const {
+			account,
+			open,
+			currentUser,
+			hasRoleAdmin,
+			toggle,
+			suggestions
+		} = this.props;
 		const {
 			openTransaction,
 			confirm,
@@ -152,7 +216,6 @@ class AccountForMan extends React.Component {
 			block,
 			loading,
 			chosen,
-			suggestions,
 			transactionData,
 			accountData,
 			errors
@@ -371,12 +434,20 @@ AccountForMan.propTypes = {
 			currency: PropTypes.string.isRequired
 		}).isRequired
 	}).isRequired,
+	suggestions: PropTypes.arrayOf(
+		PropTypes.shape({
+			maskAccountNumber: PropTypes.string.isRequired,
+			userName: PropTypes.string.isRequired
+		})
+	).isRequired,
 	toggle: PropTypes.func.isRequired,
 	open: PropTypes.bool.isRequired,
 	enableTransaction: PropTypes.bool.isRequired,
+	transaction: PropTypes.func.isRequired,
 	enableEdit: PropTypes.bool.isRequired,
 	edit: PropTypes.func.isRequired,
-	enableBlock: PropTypes.bool.isRequired
+	enableBlock: PropTypes.bool.isRequired,
+	block: PropTypes.func.isRequired
 };
 
 export default AccountForMan;

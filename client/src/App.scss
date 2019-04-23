@@ -182,7 +182,7 @@ section {
   color: white;
   height: 140vh;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5vw), 0 100%);
-  margin-bottom: -5vw;
+  margin-bottom: calc(-10vh - 5rem);
   z-index: 30;
 }
 
@@ -190,6 +190,7 @@ section {
   position: relative;
   background-color: $indigo;
   color: white;
+  bottom: -5rem;
 }
 
 .account-section::after,

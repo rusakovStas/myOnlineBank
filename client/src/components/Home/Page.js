@@ -1,7 +1,8 @@
 import React from "react";
 import ScrollAnimation from "react-animate-on-scroll";
+import { toastr } from "react-redux-toastr";
+import { Container, Row, Col } from "reactstrap";
 import AccountForMan from "../Account/AccountForMan";
-import { Container, Row, Col, Button } from "reactstrap";
 
 class HomePage extends React.Component {
 	state = {
@@ -13,9 +14,14 @@ class HomePage extends React.Component {
 			number: "5469 0600 1234 5678",
 			id: "1"
 		},
+		suggestions: [
+			{ maskAccountNumber: "**** 1223", userName: "Jhon" },
+			{ maskAccountNumber: "**** 9999", userName: "My own account" }
+		],
 		stepFirst: false,
 		stepSecond: false,
-		stepThird: false
+		stepThird: false,
+		stepFourth: false
 	};
 
 	toggle = () => {
@@ -27,6 +33,21 @@ class HomePage extends React.Component {
 			account: { ...this.state.account, name: newName },
 			stepSecond: true
 		});
+	};
+
+	transaction = sum => {
+		const newSum = Number(this.state.account.amount.sum) - Number(sum);
+		this.setState(
+			{
+				account: { ...this.state.account, amount: { sum: newSum } },
+				stepThird: true
+			},
+			() => toastr.success("Message from server", "You did it!")
+		);
+	};
+
+	block = () => {
+		this.setState({ stepFourth: true });
 	};
 
 	stepThirdDone = () => {
@@ -60,8 +81,8 @@ class HomePage extends React.Component {
 									className="mb-2 mt-2"
 								>
 									<h6>
-										This is your new mate.
-										<p>He lives on tab "Accounts"</p>
+										There is your new mate.
+										<p>He lives on the Accounts tab</p>
 									</h6>
 								</Col>
 
@@ -103,8 +124,8 @@ class HomePage extends React.Component {
 									className="mb-2 mt-2"
 								>
 									<h5 className="mb-4">
-										Just click on him and you'll see all
-										what he can
+										Just click on it and you will see all
+										what it can
 									</h5>
 								</Col>
 
@@ -133,7 +154,7 @@ class HomePage extends React.Component {
 									style={{ zIndex: 200 }}
 								>
 									<p>
-										<h6>That was easy, isn't?</h6>
+										<h6>That was easy, right?</h6>
 										<h6>Let's move on</h6>
 									</p>
 								</div>
@@ -158,8 +179,8 @@ class HomePage extends React.Component {
 										account
 									</h5>
 									<p>
-										Type new name of account and click on
-										Accept button to confirm your change
+										Enter a new account name and click on
+										Accept button to confirm your changes
 									</p>
 								</Col>
 
@@ -210,21 +231,22 @@ class HomePage extends React.Component {
 									className="mb-2 mt-2"
 								>
 									<h5 className="mb-4">
-										Click on Transaction button to send some
-										money
+										Click on the Transaction button to send
+										some money
 									</h5>
 								</Col>
 								<Col md="4" className="mt-5">
 									<p className="text-lg-left">
-										1. Type user name (for example - Jhon)
-										or 'My own account' if you want send
-										money to your another account
+										1. Type user name, for example - Jhon,
+										or My own account if you want send money
+										to your own account
 									</p>
 									<p className="text-lg-left">
-										2. Type amount sum
+										2. Enter amount sum
 									</p>
 									<p className="text-lg-left">
-										3. Click on accept button to send money
+										3. Click on the Accept button to send
+										money
 									</p>
 								</Col>
 								<Col md="8">
@@ -233,8 +255,10 @@ class HomePage extends React.Component {
 											currentUser="you"
 											account={this.state.account}
 											toggle={() => {}}
+											suggestions={this.state.suggestions}
 											open
 											enableTransaction
+											transaction={this.transaction}
 											enableEdit={false}
 											enableBlock={false}
 											hasRoleAdmin={false}
@@ -243,15 +267,17 @@ class HomePage extends React.Component {
 								</Col>
 							</Row>
 							{this.state.stepThird && (
-								<div
-									className="col-sm-12 mt-auto mb-3"
-									style={{ zIndex: 200 }}
-								>
-									<p>
-										<h6>That was easy, isn't?</h6>
-										<h6>Let's move on</h6>
-									</p>
-								</div>
+								<Row>
+									<Col md="12" className="mt-5">
+										<p>
+											<h6>
+												Don't worry it was not real
+												money ;)
+											</h6>
+											<h6>We are about finish</h6>
+										</p>
+									</Col>
+								</Row>
 							)}
 						</Container>
 					</div>
@@ -259,55 +285,75 @@ class HomePage extends React.Component {
 				<section className="account-section-fourth">
 					<div className="row h-100">
 						<div className="col-sm-12 my-auto">
-							<h1>Block</h1>
+							<h1 className="mt-5">
+								{this.state.stepFourth ? "All done" : "Block"}
+							</h1>
 						</div>
 						<Container>
-							<Row>
-								<Col
-									sm="12"
-									md={{ size: 10, offset: 1 }}
-									className="mb-2 mt-2"
+							{this.state.stepFourth ? (
+								<div
+									className="col-sm-12 mt-auto mb-3"
+									style={{ zIndex: 200 }}
 								>
 									<h6>
-										Click on block button to delete your
-										account
+										Yes, it's just disappear
+										<p>But don't worry</p>
+										<p>It was just a training ;)</p>
+										<p>But we have a real gift for you</p>
 										<p>
-											You should be <b>Very Carefull</b>{" "}
-											with this.
+											On tab Account a new brilliant
+											account with some money is waiting
+											for you!
 										</p>
-										<p>
-											When you delete account you lost all
-											your money on him
-										</p>
+										<p>We hope you enjoy working with us</p>
 									</h6>
-								</Col>
+								</div>
+							) : (
+								<Row>
+									<Col
+										sm="12"
+										md={{ size: 10, offset: 1 }}
+										className="mb-2 mt-2"
+									>
+										<h6>
+											Click on block button to delete your
+											account
+											<p>
+												You should be{" "}
+												<b>Very Carefull</b> with this.
+											</p>
+											<p>
+												When you delete an account you{" "}
+												<b>
+													lose all the money that was
+													on it
+												</b>
+											</p>
+										</h6>
+									</Col>
 
-								<Col
-									sm="12"
-									md={{ size: 10, offset: 1 }}
-									className="mb-3"
-								>
-									<Container>
-										<AccountForMan
-											currentUser="you"
-											account={this.state.account}
-											toggle={this.toggle}
-											open
-											enableTransaction={false}
-											enableEdit={false}
-											enableBlock
-											hasRoleAdmin={false}
-										/>
-									</Container>
-								</Col>
-							</Row>
+									<Col
+										sm="12"
+										md={{ size: 10, offset: 1 }}
+										className="mb-3"
+									>
+										<Container>
+											<AccountForMan
+												currentUser="you"
+												account={this.state.account}
+												toggle={this.toggle}
+												open
+												enableTransaction={false}
+												enableEdit={false}
+												enableBlock
+												block={this.block}
+												hasRoleAdmin={false}
+											/>
+										</Container>
+									</Col>
+								</Row>
+							)}
 						</Container>
-						<div
-							className="col-sm-12 mt-auto mb-3"
-							style={{ zIndex: 200 }}
-						>
-							<h6>Let's see what we can do</h6>
-						</div>
 					</div>
 				</section>
 				{false && (

@@ -16,7 +16,7 @@ import NumberFormat from "react-number-format";
 import FormButton from "../commons/FormButton";
 import InlineError from "../commons/InlineError";
 
-class Account extends React.Component {
+class AccountForMan extends React.Component {
 	state = {
 		openTransaction: false,
 		confirm: false,
@@ -71,28 +71,27 @@ class Account extends React.Component {
 	};
 
 	toggleTransaction = () => {
-		// По хорошему нужно делать какой нибудь хитрый loading, но пока вроде нет проблем оставлю так
-		this.props
-			.getSuggestions(this.props.account.id)
-			.then(res => this.setState({ suggestions: res }));
 		this.setState({
-			transaction: true,
-			openTransaction: !this.state.openTransaction && this.props.open,
-			confirm: true
+			transaction: this.props.enableTransaction,
+			openTransaction:
+				this.props.enableTransaction &&
+				!this.state.openTransaction &&
+				this.props.open,
+			confirm: this.props.enableTransaction
 		});
 	};
 
 	toggleEdit = () => {
 		this.setState({
-			edite: true,
-			confirm: true
+			edite: this.props.enableEdit,
+			confirm: this.props.enableEdit
 		});
 	};
 
 	toggleBlock = () => {
 		this.setState({
-			block: true,
-			confirm: true
+			block: this.props.enableBlock,
+			confirm: this.props.enableBlock
 		});
 	};
 
@@ -121,69 +120,42 @@ class Account extends React.Component {
 		}
 	};
 
+	onChangeAccountName = e =>
+		this.setState({
+			accountData: {
+				name: e.target.value ? e.target.value : ""
+			}
+		});
+
 	accept = () => {
 		if (this.state.block) {
-			this.setState({ loading: true });
-			this.props
-				.decline(this.props.account.id)
-				.catch(err =>
-					this.setState({
-						loading: false,
-						errors: { global: err.response.data.message }
-					})
-				)
-				.finally(() =>
-					this.setState({
-						loading: false,
-						confirm: false,
-						block: false
-					})
-				);
+			this.props.block();
 		}
 		if (this.state.edite) {
-			this.setState({ loading: true });
-			this.props
-				.edite(this.state.accountData)
-				.catch(err =>
-					this.setState({
-						errors: { global: err.response.data.message }
-					})
-				)
-				.finally(() =>
-					this.setState({
-						loading: false,
-						accountData: {},
-						confirm: false,
-						edite: false
-					})
-				);
+			this.props.edit(this.state.accountData.name);
+			this.setState({
+				loading: false,
+				accountData: {},
+				confirm: false,
+				edite: false
+			});
 		}
 		if (this.state.transaction) {
 			const errors = this.validate(this.state.transactionData);
 			this.setState({ errors });
 			if (Object.keys(errors).length === 0) {
-				this.setState({ loading: true });
-				this.props
-					.transaction(this.state.transactionData)
-					.catch(err =>
-						this.setState({
-							errors: { global: err.response.data.message }
-						})
-					)
-					.finally(() =>
-						this.setState({
-							loading: false,
-							transactionData: {
-								amount: { sum: null },
-								userTo: null,
-								accountIdTo: null
-							},
-							chosen: [],
-							confirm: false,
-							transaction: false,
-							openTransaction: false
-						})
-					);
+				this.props.transaction(this.state.transactionData.amount.sum);
+				this.setState({
+					transactionData: {
+						amount: { sum: null },
+						userTo: null,
+						accountIdTo: null
+					},
+					chosen: [],
+					confirm: false,
+					transaction: false,
+					openTransaction: false
+				});
 			}
 		}
 	};
@@ -228,16 +200,15 @@ class Account extends React.Component {
 		});
 	};
 
-	onChangeAccountName = e =>
-		this.setState({
-			accountData: {
-				name: e.target.value ? e.target.value : "",
-				id: this.props.account.id
-			}
-		});
-
 	render() {
-		const { account, open, toggle, currentUser, hasRoleAdmin } = this.props;
+		const {
+			account,
+			open,
+			currentUser,
+			hasRoleAdmin,
+			toggle,
+			suggestions
+		} = this.props;
 		const {
 			openTransaction,
 			confirm,
@@ -245,14 +216,13 @@ class Account extends React.Component {
 			block,
 			loading,
 			chosen,
-			suggestions,
 			transactionData,
 			accountData,
 			errors
 		} = this.state;
 		return (
 			<div>
-				<Card className="text-center account-item p-2 text-white  shadow-lg">
+				<Card className="text-center account-item p-2 text-white shadow-lg">
 					{errors.global && <InlineError text={errors.global} />}
 					{(!!account.name || edite) && (
 						<CardTitle>
@@ -271,7 +241,7 @@ class Account extends React.Component {
 							/>
 						</CardTitle>
 					)}
-					<CardText onClick={() => toggle(account.id)}>
+					<CardText onClick={() => toggle()}>
 						<large>
 							<p>
 								<b
@@ -381,10 +351,7 @@ class Account extends React.Component {
 											block
 											color="danger"
 											className="mb-2"
-											disabled={
-												account.user.username !==
-												currentUser
-											}
+											disabled={!this.props.enableBlock}
 											onClick={this.toggleBlock}
 										>
 											Block
@@ -396,10 +363,7 @@ class Account extends React.Component {
 											size="lg"
 											block
 											color="success"
-											disabled={
-												account.user.username !==
-												currentUser
-											}
+											disabled={!this.props.enableEdit}
 											onClick={this.toggleEdit}
 										>
 											{!!account.name ||
@@ -413,6 +377,9 @@ class Account extends React.Component {
 											size="lg"
 											block
 											color="purple"
+											disabled={
+												!this.props.enableTransaction
+											}
 											onClick={this.toggleTransaction}
 										>
 											Transaction
@@ -452,12 +419,9 @@ class Account extends React.Component {
 	}
 }
 
-Account.propTypes = {
+AccountForMan.propTypes = {
 	hasRoleAdmin: PropTypes.bool.isRequired,
 	currentUser: PropTypes.string.isRequired,
-	transaction: PropTypes.func.isRequired,
-	decline: PropTypes.func.isRequired,
-	edite: PropTypes.func.isRequired,
 	account: PropTypes.shape({
 		id: PropTypes.number.isRequired,
 		name: PropTypes.string,
@@ -470,9 +434,20 @@ Account.propTypes = {
 			currency: PropTypes.string.isRequired
 		}).isRequired
 	}).isRequired,
-	getSuggestions: PropTypes.func.isRequired,
+	suggestions: PropTypes.arrayOf(
+		PropTypes.shape({
+			maskAccountNumber: PropTypes.string.isRequired,
+			userName: PropTypes.string.isRequired
+		})
+	).isRequired,
+	toggle: PropTypes.func.isRequired,
 	open: PropTypes.bool.isRequired,
-	toggle: PropTypes.func.isRequired
+	enableTransaction: PropTypes.bool.isRequired,
+	transaction: PropTypes.func.isRequired,
+	enableEdit: PropTypes.bool.isRequired,
+	edit: PropTypes.func.isRequired,
+	enableBlock: PropTypes.bool.isRequired,
+	block: PropTypes.func.isRequired
 };
 
-export default Account;
+export default AccountForMan;

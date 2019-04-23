@@ -102,16 +102,6 @@ $alert-border-radius: 0px !default;
   border-bottom: 1px solid #e9ecef !important;
 }
 
-section {
-  overflow-x: hidden;
-  width: 100%;
-  max-width: none;
-  text-align: center;
-  background-color: $gray-100;
-  height: 110vh;
-  color: black;
-}
-
 .account-item {
   background: linear-gradient(to right, #5b86e5, #36d1dc);
 
@@ -145,6 +135,16 @@ section {
   background: transparent !important;
 }
 
+section {
+  width: 100%;
+  max-width: none;
+  text-align: center;
+  background-color: $gray-100;
+  height: 120vh;
+  color: black;
+  position: relative;
+}
+
 .intro-section {
   background-color: $gray-800;
   height: calc(
@@ -158,9 +158,72 @@ section {
   color: white;
 }
 
+.account-section-first {
+  position: relative;
+  background-color: $yellow;
+  color: white;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10vw), 0 100%);
+  margin-bottom: -10vw;
+  z-index: 50;
+}
+
+.account-section-second {
+  position: relative;
+  background-color: $green;
+  color: white;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 5vw));
+  margin-bottom: -5vw;
+  z-index: 40;
+}
+
+.account-section-third {
+  position: relative;
+  background-color: $cyan;
+  color: white;
+  height: 140vh;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5vw), 0 100%);
+  margin-bottom: calc(-10vh - 5rem);
+  z-index: 30;
+}
+
+.account-section-fourth {
+  position: relative;
+  background-color: $indigo;
+  color: white;
+  bottom: -5rem;
+}
+
+.account-section::after,
+.account-section::before {
+  position: absolute;
+  content: "";
+  height: 5rem;
+  width: 5rem;
+  background: $orangered;
+  bottom: -1em;
+  z-index: 100;
+}
+
+.account-section::before {
+  right: 50%;
+  transform: skew(0, 25deg);
+}
+.account-section::after {
+  left: 50%;
+  transform: skew(0, -25deg);
+}
+
+.admin-section {
+}
+
 /* Делаем отступ снизу что бы зафиксированная кнопка влезала */
 body {
   padding-bottom: 5rem;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 /*Test markers*/

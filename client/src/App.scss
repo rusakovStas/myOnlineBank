@@ -214,6 +214,8 @@ section {
 }
 
 .admin-section {
+  position: relative;
+  bottom: -1em;
 }
 
 /* Делаем отступ снизу что бы зафиксированная кнопка влезала */

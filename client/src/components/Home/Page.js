@@ -236,18 +236,20 @@ class HomePage extends React.Component {
 									</h5>
 								</Col>
 								<Col md="4" className="mt-5">
-									<p className="text-lg-left">
-										1. Type user name, for example - Jhon,
-										or My own account if you want send money
-										to your own account
-									</p>
-									<p className="text-lg-left">
-										2. Enter amount sum
-									</p>
-									<p className="text-lg-left">
-										3. Click on the Accept button to send
-										money
-									</p>
+									<Container>
+										<p className="text-lg-left">
+											1. Type user name, for example -
+											Jhon, or My own account if you want
+											send money to your own account
+										</p>
+										<p className="text-lg-left">
+											2. Enter amount sum
+										</p>
+										<p className="text-lg-left">
+											3. Click on the Accept button to
+											send money
+										</p>
+									</Container>
 								</Col>
 								<Col md="8">
 									<Container>

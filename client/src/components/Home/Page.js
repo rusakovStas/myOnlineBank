@@ -1,7 +1,8 @@
 import React from "react";
-import ScrollAnimation from "react-animate-on-scroll";
 import { toastr } from "react-redux-toastr";
 import { Container, Row, Col } from "reactstrap";
+import { PropTypes } from "prop-types";
+import { connect } from "react-redux";
 import AccountForMan from "../Account/AccountForMan";
 
 class HomePage extends React.Component {
@@ -52,6 +53,10 @@ class HomePage extends React.Component {
 
 	stepThirdDone = () => {
 		this.setState({ stepThird: true });
+	};
+
+	getTitleForStepFour = () => {
+		return this.props.hasRoleAdmin ? "All done... almost" : "All done";
 	};
 
 	render() {
@@ -288,7 +293,9 @@ class HomePage extends React.Component {
 					<div className="row h-100">
 						<div className="col-sm-12 my-auto">
 							<h1 className="mt-5">
-								{this.state.stepFourth ? "All done" : "Block"}
+								{this.state.stepFourth
+									? this.getTitleForStepFour()
+									: "Block"}
 							</h1>
 						</div>
 						<Container>
@@ -308,6 +315,12 @@ class HomePage extends React.Component {
 											for you!
 										</p>
 										<p>We hope you enjoy working with us</p>
+										{this.props.hasRoleAdmin && (
+											<p>
+												P.S. take a look at the last
+												part of instruction below
+											</p>
+										)}
 									</h6>
 								</div>
 							) : (
@@ -358,14 +371,75 @@ class HomePage extends React.Component {
 						</Container>
 					</div>
 				</section>
-				{false && (
+				{this.props.hasRoleAdmin && (
 					<section className="admin-section">
 						<div className="row h-100">
-							<div className="col-sm-12 my-auto">
-								<ScrollAnimation animateIn="fadeIn">
-									<h1>Instruction for Admin tab</h1>
-								</ScrollAnimation>
-							</div>
+							<Container>
+								<div className="col-sm-12 my-auto">
+									<h1 className="mt-5">
+										Who is the Boss here?
+									</h1>
+									<h2>It's you!</h2>
+									<p>Yes, you have some special abilities</p>
+									<Row>
+										<Col
+											sm="12"
+											md={{ size: 10, offset: 1 }}
+											className="mb-2 mt-2"
+										>
+											<h6>
+												For example, all your accounts
+												with no limit amount of money
+											</h6>
+										</Col>
+
+										<Col
+											sm="12"
+											md={{ size: 10, offset: 1 }}
+											className="mb-3"
+										>
+											<Container>
+												<AccountForMan
+													currentUser="you"
+													account={this.state.account}
+													toggle={this.toggle}
+													open={false}
+													enableTransaction={false}
+													enableEdit={false}
+													enableBlock={false}
+													block={() => {}}
+													hasRoleAdmin
+												/>
+											</Container>
+										</Col>
+									</Row>
+									<Row>
+										<Col md="12" className="mt-5">
+											<p>
+												<h6>
+													And also you can do
+													transaction under any
+													another user
+												</h6>
+												<h6>
+													Even if amount of
+													transaction is more than he
+													have
+												</h6>
+												<h6>
+													Use it carefully and don't
+													forget:
+												</h6>
+												<h4>
+													With great power comes great
+													responsibility...
+												</h4>
+												<h4>but it's still cool ;)</h4>
+											</p>
+										</Col>
+									</Row>
+								</div>
+							</Container>
 						</div>
 					</section>
 				)}
@@ -374,4 +448,16 @@ class HomePage extends React.Component {
 	}
 }
 
-export default HomePage;
+HomePage.propTypes = {
+	hasRoleAdmin: PropTypes.bool.isRequired
+};
+
+function mapStateToProps(store) {
+	return {
+		hasRoleAdmin:
+			!!store.user.roles &&
+			!!store.user.roles.find(element => element === "ROLE_ADMIN")
+	};
+}
+
+export default connect(mapStateToProps)(HomePage);

@@ -1,9 +1,6 @@
 package integration.po;
 
-import com.codeborne.selenide.CollectionCondition;
-import com.codeborne.selenide.Condition;
-import com.codeborne.selenide.Driver;
-import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.*;
 import com.codeborne.selenide.conditions.Text;
 import org.openqa.selenium.WebElement;
 

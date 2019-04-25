@@ -18,13 +18,15 @@ $black: #000 !default;
 
 $blue: #5475ed !default;
 $indigo: #6610f2 !default;
+$indigo-600: #6316e0 !default;
 $purple: #7015bd !default;
 $pink: #e83e8c !default;
 $red: #ed4040 !default;
 $orange: #fb9678 !default;
-$orangered: #ff4500 !default;
+$orangered: #d83e06 !default;
 $yellow: #fec107 !default;
 $green: #17e832 !default;
+$green-600: #16ce2f !default;
 $teal: #20c997 !default;
 $cyan: #01c0c8 !default;
 $primary: #ed4040 !default;
@@ -104,29 +106,6 @@ $alert-border-radius: 0px !default;
 
 .account-item {
   background: linear-gradient(to right, #5b86e5, #36d1dc);
-
-  /*background: linear-gradient(to bottom right, $gray-800, $gray-900) !important;*/
-  /*Cover with cat*/
-
-  /*background: url(./components/Account/cat.jpg);*/
-
-  /*Dark simple cover with gradient*/
-
-  /*background: linear-gradient(
-      45deg,
-      rgba(103, 0, 31, 0.8),
-      rgba(34, 101, 163, 0.5)
-    ),
-    url(./components/Account/cover.jpg);*/
-
-  /*Cover with flowers*/
-
-  /*  background: linear-gradient(
-      45deg,
-      rgba(103, 0, 31, 0.8),
-      rgba(34, 101, 163, 0.5)
-    ),
-    url(./components/Account/cover_flowers.jpg);*/
   border-radius: 10px;
   background-size: cover;
 }
@@ -169,7 +148,7 @@ section {
 
 .account-section-second {
   position: relative;
-  background-color: $green;
+  background-color: $green-600;
   color: white;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 5vw));
   margin-bottom: -6vw;
@@ -188,7 +167,7 @@ section {
 
 .account-section-fourth {
   position: relative;
-  background-color: $indigo;
+  background-color: $indigo-600;
   color: white;
   bottom: -5rem;
 }

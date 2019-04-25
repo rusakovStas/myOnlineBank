@@ -21,8 +21,10 @@ task integrationTest(type: Test) {
     include 'integration/**/*'
     exclude 'api/**/*'
     exclude 'com/stasdev/backend/**/*'
-    systemProperty "selenide.baseUrl", System.getProperty("selenide.baseUrl")
-    systemProperty "selenide.browser", System.getProperty("selenide.browser")
+    if (System.getProperty("selenide.baseUrl") && System.getProperty("selenide.browser")){
+        systemProperty "selenide.baseUrl", System.getProperty("selenide.baseUrl")
+        systemProperty "selenide.browser", System.getProperty("selenide.browser")
+    }
 }
 
 task localAllTest(type: Test) {

@@ -66,6 +66,10 @@ task copyFrontBuildToPublic(type: Copy) {
 	into "${project.projectDir}/src/main/resources/public"
 }
 
+task clearPublic(type: Delete){
+	project.delete(files("${project.projectDir}/src/main/resources/public/"))
+}
+
 def profiles = 'dev'
 
 bootRun {

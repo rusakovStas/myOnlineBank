@@ -46,7 +46,7 @@ pipeline {
         stage('Build Front') {
             steps {
                 sh "cd ${workspace}/client && yarn build"
-                sh "cd ${workspace}/client && JENKINS_NODE_COOKIE=dontKillMe pm2 delete -s app-3000 || : && pm2 serve build 3000 --name=app-3000 --spa"
+                sh "cd ${workspace}/client && JENKINS_NODE_COOKIE=dontKillMe pm2 delete -s app-2222 || : && pm2 serve build 2222 --name=app-2222 --spa"
             }
         }
         stage('Deploy') {

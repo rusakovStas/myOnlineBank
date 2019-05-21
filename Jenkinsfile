@@ -46,7 +46,7 @@ pipeline {
         stage('Build Front') {
             steps {
                 sh "cd ${workspace}/client && yarn build"
-                sh "cd ${workspace}/client pm2 delete -s app-2222 || : pm2 serve build 2222 --name=app-2222 --spa"
+                sh "cd ${workspace}/client && pm2 delete -s app-2222 || : pm2 serve build 2222 --name=app-2222 --spa"
             }
         }
         stage('Deploy') {

@@ -3,6 +3,7 @@ package api;
 import com.stasdev.backend.errors.NotImplementedYet;
 import com.stasdev.backend.model.entitys.*;
 import com.stasdev.backend.model.services.impl.PreparerImpl;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -174,16 +175,16 @@ class AccountsControllerTest extends CommonApiTest {
 
         Account accountUpdatedFrom = accountStompHandlerFrom
                 .getMessage(0)
-                .get(10, SECONDS);
+                .get(3, SECONDS);
         Account accountUpdatedTo = accountStompHandlerTo
                 .getMessage(0)
-                .get(10, SECONDS);
+                .get(3, SECONDS);
         Push pushFromCheck = pushStompHandlerFrom
                 .getMessage(0)
-                .get(10, SECONDS);
+                .get(3, SECONDS);
         Push pushToCheck = pushStompHandlerTo
                 .getMessage(0)
-                .get(10, SECONDS);
+                .get(3, SECONDS);
         assertThat(accountDef, is(equalTo(accountUpdatedFrom)));
         assertThat(accountUser, is(equalTo(accountUpdatedTo)));
 
@@ -357,6 +358,7 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
+    @Disabled
     void adminCanDoTransactionFromAnyAccounts() throws InterruptedException, ExecutionException, TimeoutException {
 
         StompSession stompSession = getStompClient()
@@ -494,6 +496,7 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
+    @Disabled
     void adminCanDoTransactionFromHisOwnAccounts() throws InterruptedException, ExecutionException, TimeoutException {
         StompSession stompSession = getStompClient()
                 .connect(socketURL, new StompSessionHandlerAdapter() {}).get(1, SECONDS);
@@ -872,7 +875,7 @@ class AccountsControllerTest extends CommonApiTest {
 
     private WebSocketStompClient getStompClient() {
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(createTransportClient()));
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());//Если этого не будет он будет МОЛЧА падать при попытке кастануть payload к нужному типу
+//        stompClient.setMessageConverter(new MappingJackson2MessageConverter());//Если этого не будет он будет МОЛЧА падать при попытке кастануть payload к нужному типу
         return stompClient;
     }
 
@@ -896,6 +899,7 @@ class AccountsControllerTest extends CommonApiTest {
 
         @Override
         public Type getPayloadType(StompHeaders headers) {
+            System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
             return typeSupplier.get();
         }
 

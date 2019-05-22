@@ -32,10 +32,6 @@ public class BeanDefs {
 
 //  *************************************** Security **********************************************
     private static final String JWT_KEY = "jwt-super-secret-key";
-    @Value("${server.host}")
-    private String serverHost;
-    @Value("${server.front.port}")
-    private String frontPort;
 
     @Bean
     public BCryptPasswordEncoder encoder() {

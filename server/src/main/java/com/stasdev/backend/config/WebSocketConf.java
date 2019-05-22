@@ -11,11 +11,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConf implements WebSocketMessageBrokerConfigurer {
 
-    @Value("${server.host}")
-    private String serverHost;
-    @Value("${server.front.port}")
-    private String frontPort;
-
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/topic");

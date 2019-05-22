@@ -875,7 +875,7 @@ class AccountsControllerTest extends CommonApiTest {
 
     private WebSocketStompClient getStompClient() {
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(createTransportClient()));
-//        stompClient.setMessageConverter(new MappingJackson2MessageConverter());//Если этого не будет он будет МОЛЧА падать при попытке кастануть payload к нужному типу
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());//Если этого не будет он будет МОЛЧА падать при попытке кастануть payload к нужному типу
         return stompClient;
     }
 

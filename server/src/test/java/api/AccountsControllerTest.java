@@ -174,16 +174,16 @@ class AccountsControllerTest extends CommonApiTest {
 
         Account accountUpdatedFrom = accountStompHandlerFrom
                 .getMessage(0)
-                .get(3, SECONDS);
+                .get(10, SECONDS);
         Account accountUpdatedTo = accountStompHandlerTo
                 .getMessage(0)
-                .get(3, SECONDS);
+                .get(10, SECONDS);
         Push pushFromCheck = pushStompHandlerFrom
                 .getMessage(0)
-                .get(3, SECONDS);
+                .get(10, SECONDS);
         Push pushToCheck = pushStompHandlerTo
                 .getMessage(0)
-                .get(3, SECONDS);
+                .get(10, SECONDS);
         assertThat(accountDef, is(equalTo(accountUpdatedFrom)));
         assertThat(accountUser, is(equalTo(accountUpdatedTo)));
 

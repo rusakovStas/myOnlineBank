@@ -22,7 +22,7 @@ pipeline {
                         try {
                             sh "cd ${workspace}/client && yarn install"
                             sh "cd ${workspace}/client && yarn run build-test"
-                            sh "curl 'http://localhost:5555/actuator/shutdown' -i -X POST"
+                            sh "curl 'http://localhost:3334/actuator/shutdown' -i -X POST"
                         }
                          catch (exc) {
                             echo 'Something failed!'
@@ -46,7 +46,7 @@ pipeline {
         stage('Build Front') {
             steps {
                 sh "cd ${workspace}/client && yarn build"
-                sh "cd ${workspace}/client && JENKINS_NODE_COOKIE=dontKillMe pm2 delete -s app-3333 || : && pm2 serve build 3333 --name=app-3333 --spa"
+                sh "cd ${workspace}/client && JENKINS_NODE_COOKIE=dontKillMe pm2 delete -s app-2222 || : && pm2 serve build 2222 --name=app-2222 --spa"
             }
         }
         stage('Deploy') {

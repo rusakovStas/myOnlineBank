@@ -19,6 +19,6 @@ public class WebSocketConf implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/online-bank").setAllowedOrigins("http://138.68.95.208:2222").withSockJS();
+        registry.addEndpoint("/online-bank").setAllowedOrigins("http://localhost:3334").withSockJS();
     }
 }

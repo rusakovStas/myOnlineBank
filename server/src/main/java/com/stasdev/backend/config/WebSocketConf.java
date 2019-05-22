@@ -1,5 +1,6 @@
 package com.stasdev.backend.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -10,6 +11,11 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConf implements WebSocketMessageBrokerConfigurer {
 
+    @Value("${server.host}")
+    private String serverHost;
+    @Value("${server.front.port}")
+    private String frontPort;
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/topic");
@@ -18,6 +24,6 @@ public class WebSocketConf implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/online-bank").setAllowedOrigins("http://138.68.95.208:2222").withSockJS();
+        registry.addEndpoint("/online-bank").setAllowedOrigins(String.format("http://%s:%s", serverHost, frontPort)).withSockJS();
     }
 }

@@ -2,6 +2,7 @@ package com.stasdev.backend.config;
 
 import org.h2.tools.Server;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -31,6 +32,10 @@ public class BeanDefs {
 
 //  *************************************** Security **********************************************
     private static final String JWT_KEY = "jwt-super-secret-key";
+    @Value("${server.host}")
+    private String serverHost;
+    @Value("${server.front.port}")
+    private String frontPort;
 
     @Bean
     public BCryptPasswordEncoder encoder() {
@@ -55,7 +60,7 @@ public class BeanDefs {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://138.68.95.208:2222");
+        config.addAllowedOrigin(String.format("http://%s:%s", serverHost, frontPort));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         config.setAllowedHeaders(Arrays.asList("X-Requested-With","Origin","Content-Type","Accept", "Authorization"));
         config.setExposedHeaders(Arrays.asList("Access-Control-Allow-Headers", "Authorization, x-xsrf-token, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +

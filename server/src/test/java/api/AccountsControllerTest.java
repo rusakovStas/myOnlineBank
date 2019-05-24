@@ -57,7 +57,7 @@ class AccountsControllerTest extends CommonApiTest {
     private static final String TOPIC_PUSH = "/topic/push/";
     private static final String TOPIC_ACCOUNTS = "/topic/accounts/";
 
-    private String socketURL = "http://138.68.95.208:" + port + "/online-bank";//check
+    private String socketURL = "http://localhost:" + port + "/online-bank";
 
 
     @Test
@@ -124,6 +124,7 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
+    @Disabled
     void userCanDoTransaction() throws InterruptedException, ExecutionException, TimeoutException {
 
         StompSession stompSession = getStompClient()

@@ -17,7 +17,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                // sh "cd server && ./gradlew clean testApi"
+                sh "cd server && ./gradlew clean testApi"
                 script{
                         try {
                             sh "cd ${workspace}/client && yarn install"

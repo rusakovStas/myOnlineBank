@@ -57,7 +57,7 @@ class AccountsControllerTest extends CommonApiTest {
     private static final String TOPIC_PUSH = "/topic/push/";
     private static final String TOPIC_ACCOUNTS = "/topic/accounts/";
 
-    private String socketURL = "http://localhost:" + port + "/online-bank";
+    private String socketURL = "http://138.68.95.208:" + port + "/online-bank";//check
 
 
     @Test

@@ -124,7 +124,7 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
-//    @Disabled
+    @Disabled
     void userCanDoTransaction() throws InterruptedException, ExecutionException, TimeoutException {
 
         StompSession stompSession = getStompClient()
@@ -359,7 +359,7 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
-//    @Disabled
+    @Disabled
     void adminCanDoTransactionFromAnyAccounts() throws InterruptedException, ExecutionException, TimeoutException {
 
         StompSession stompSession = getStompClient()
@@ -497,7 +497,7 @@ class AccountsControllerTest extends CommonApiTest {
     }
 
     @Test
-//    @Disabled
+    @Disabled
     void adminCanDoTransactionFromHisOwnAccounts() throws InterruptedException, ExecutionException, TimeoutException {
         StompSession stompSession = getStompClient()
                 .connect(socketURL, new StompSessionHandlerAdapter() {}).get(1, SECONDS);
